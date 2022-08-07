@@ -3,7 +3,6 @@
 #pragma once
 
 //custom header
-#include "HandController.h"
 
 //unreal header
 #include "Components/SceneComponent.h"
@@ -21,9 +20,19 @@ public:
 	AVRCharacter();
 
 protected:
+	// Components (BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		class UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		class UMotionControllerComponent* ControllerLeft;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		class UMotionControllerComponent* ControllerRight;
+
 	virtual void BeginPlay() override;
 
-	void HMDSyncLocationAndRotation();
+	void HMDSyncLocation();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -38,25 +47,15 @@ private:
 		float BaseTurnRate = 45.f;
 
 	UPROPERTY(EditAnywhere, category = "Setting")
-		float CharacterEyeHeight = 89;
+		float CharacterEyeHeight = 75;
 
 	UPROPERTY(EditAnywhere, category = "Setting")
 		float CharacterEyeForward = 40;
 
 	UPROPERTY(EditAnywhere, category = "Blinkers")
-		bool UseBlinker = true;
-
-	// MotionController
-	UPROPERTY()
-		AHandController* LeftController;
-
-	UPROPERTY()
-		AHandController* RightController;
+		bool UseBlinker = false;
 
 	// Components
-	UPROPERTY(VisibleAnywhere)
-		class UCameraComponent* Camera;
-
 	UPROPERTY(VisibleAnywhere)
 		class USceneComponent* VRRoot;
 
@@ -67,9 +66,6 @@ private:
 		class UPostProcessComponent* PostProcessComponent;
 
 	// Property
-	UPROPERTY(EditDefaultsOnly, category = "Setting") //BP_HandController를 담는다.
-		TSubclassOf<AHandController> HandControllerClass;
-
 	UPROPERTY()
 		class UMaterialInstanceDynamic* BlinkerMaterialInstance;
 
@@ -78,6 +74,12 @@ private:
 
 	UPROPERTY(EditAnywhere, category = "Blinkers") //동적인 Blink를 위한 커브 
 		class UCurveFloat* RadiusVsVelocity;
+
+	UPROPERTY(EditDefaultsOnly, category = "Setting")
+		TSubclassOf<class UAnimInstance> PCAnimClass;
+
+	UPROPERTY(EditDefaultsOnly, category = "Setting")
+		TSubclassOf<class UAnimInstance> VRAnimClass;
 
 	// Function
 	UFUNCTION()

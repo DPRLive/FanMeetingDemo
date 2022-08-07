@@ -4,6 +4,8 @@
 
 
 //unreal header
+#include "Animation/AnimInstance.h"
+#include "MotionControllerComponent.h"
 #include "Components/PostProcessComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
@@ -26,26 +28,34 @@ AVRCharacter::AVRCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera")); // 카메라 컴포넌트
 	Camera->SetupAttachment(CameraSpringArm);
 
+	ControllerLeft = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("ControllerLeft"));
+	ControllerLeft->SetupAttachment(VRRoot);
+
+	ControllerRight = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("ControllerRight"));
+	ControllerRight->SetupAttachment(VRRoot);
+
 	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
 	PostProcessComponent->SetupAttachment(GetRootComponent());
 }
 
 void AVRCharacter::BeginPlay()
 {
-	Super::BeginPlay();
-
 	// HMD를 사용하는지 여부
 	UseHMD = UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayConnected()
 		&& UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled();
 
-	// 캐릭터의 눈높이로 카메라 위치 설정 
-	VRRoot->AddLocalOffset(FVector(0, 0, CharacterEyeHeight));
-	CameraSpringArm->AddLocalOffset(FVector(CharacterEyeForward, 0, 0));
+	VRRoot->AddLocalOffset(FVector(0, 0, -88));
+	//cameraspringarm->addlocaloffset(fvector(charactereyeforward, 0, 0));
+	//cameraspringarm->targetarmlength = 0;
 
 	PostProcessComponent->bUnbound = false;
 
 	if (UseHMD)
 	{
+		GetMesh()->SetAnimClass(VRAnimClass);
+		// VR 사용시 세팅
+		ControllerLeft->SetTrackingSource(EControllerHand::Left);
+		ControllerRight->SetTrackingSource(EControllerHand::Right);
 		//멀미 방지를 위한 Blinkers
 		if (BlinkerMaterialBase != nullptr && PostProcessComponent != nullptr)
 		{
@@ -54,50 +64,35 @@ void AVRCharacter::BeginPlay()
 			// 액터가 들고있는 PostProcess Component에 적용
 			PostProcessComponent->AddOrUpdateBlendable(BlinkerMaterialInstance);
 		}
-	
-		//BP_HandController로 캐스팅하여 만든다. 왼손 컨트롤러, 오른손 컨트롤러 스폰.
-		LeftController = GetWorld()->SpawnActor<AHandController>(HandControllerClass);
-		if (LeftController != nullptr)
-		{
-			LeftController->AttachToComponent(VRRoot, FAttachmentTransformRules::KeepRelativeTransform);
-			LeftController->SetHand(EControllerHand::Left);
-			LeftController->SetOwner(this);
-		}
 
-		RightController = GetWorld()->SpawnActor<AHandController>(HandControllerClass);
-		if (RightController != nullptr)
-		{
-			RightController->AttachToComponent(VRRoot, FAttachmentTransformRules::KeepRelativeTransform);
-			RightController->SetHand(EControllerHand::Right);
-			RightController->SetOwner(this);
-		}
 	}
+	else
+	{
+		// PC 사용시 세팅
+		GetMesh()->SetAnimClass(PCAnimClass);
+		Camera->AddLocalOffset(FVector(0, 0, 88));
+	}
+	// Super::BeginPlay를 나중에 호출해야 cpp코드가 블루프린트보다 먼저 호출됨.
+	Super::BeginPlay();
 }
 
 void AVRCharacter::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
 	if (UseHMD)
 	{
-		HMDSyncLocationAndRotation();
+		//HMDSyncLocation();
 		if (UseBlinker) UpdateBlinkers();
 	}
+	Super::Tick(DeltaTime);
 }
 
-void AVRCharacter::HMDSyncLocationAndRotation()
+void AVRCharacter::HMDSyncLocation()
 {
 	// 헤드마운트 디스플레이에 따른 캐릭터 위치 조정
 	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
 	NewCameraOffset.Z = 0;
 	AddActorWorldOffset(NewCameraOffset);
 	VRRoot->AddWorldOffset(-NewCameraOffset);
-
-	// HMD 회전에 따라 좌, 우 캐릭터 회전
-	FRotator HMDRotation;
-	FVector HMDPosition;
-	UHeadMountedDisplayFunctionLibrary::GetOrientationAndPosition(HMDRotation, HMDPosition);
-	AddActorLocalRotation(FRotator(0, HMDRotation.Yaw, 0));
 }
 
 void AVRCharacter::UpdateBlinkers()
@@ -134,12 +129,12 @@ void AVRCharacter::OnResetVR()
 
 void AVRCharacter::MoveForward(float Scale)
 {
-	AddMovementInput(GetActorForwardVector(), Scale);
+	AddMovementInput(Camera->GetForwardVector(), Scale);
 }
 
 void AVRCharacter::MoveRight(float Scale)
 {
-	AddMovementInput(GetActorRightVector(), Scale);
+	AddMovementInput(Camera->GetRightVector(), Scale);
 }
 
 void AVRCharacter::TurnRightAction()
