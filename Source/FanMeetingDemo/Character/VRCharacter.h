@@ -34,6 +34,15 @@ protected:
 
 	void HMDSyncLocation();
 
+	//UFUNCTION(Server, Reliable, WithValidation)
+	//	void Server_HMDSyncLocation(FVector NewLocation);
+
+	//UPROPERTY(ReplicatedUsing = OnRep_RepLocation)
+	//	FVector RepLocation;
+
+	//UFUNCTION()
+	//	void OnRep_RepLocation();
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -41,16 +50,8 @@ public:
 
 private:
 	//Setting
-	bool UseHMD;
-
 	UPROPERTY(VisibleAnywhere, category = "Setting")
 		float BaseTurnRate = 45.f;
-
-	UPROPERTY(EditAnywhere, category = "Setting")
-		float CharacterEyeHeight = 75;
-
-	UPROPERTY(EditAnywhere, category = "Setting")
-		float CharacterEyeForward = 40;
 
 	UPROPERTY(EditAnywhere, category = "Blinkers")
 		bool UseBlinker = false;
@@ -58,9 +59,6 @@ private:
 	// Components
 	UPROPERTY(VisibleAnywhere)
 		class USceneComponent* VRRoot;
-
-	UPROPERTY(VisibleAnywhere)
-		class USpringArmComponent* CameraSpringArm;
 
 	UPROPERTY() // Blinker를 위한 포스트프로세스 컴포넌트
 		class UPostProcessComponent* PostProcessComponent;
@@ -74,12 +72,6 @@ private:
 
 	UPROPERTY(EditAnywhere, category = "Blinkers") //동적인 Blink를 위한 커브 
 		class UCurveFloat* RadiusVsVelocity;
-
-	UPROPERTY(EditDefaultsOnly, category = "Setting")
-		TSubclassOf<class UAnimInstance> PCAnimClass;
-
-	UPROPERTY(EditDefaultsOnly, category = "Setting")
-		TSubclassOf<class UAnimInstance> VRAnimClass;
 
 	// Function
 	UFUNCTION()

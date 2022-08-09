@@ -13,5 +13,6 @@ UCLASS()
 class FANMEETINGDEMO_API AFanMeetingDemoGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+
 };
