@@ -74,30 +74,36 @@ void AVRCharacter::BeginPlay()
 
 void AVRCharacter::Tick(float DeltaTime)
 {
-	//HMDSyncLocation();
-	
+	//if (HasAuthority())
+	Super::Tick(DeltaTime);
+	CalculateHMDToCharLocation();
+	HMDSyncLocation();
+
 	if (UseBlinker) UpdateBlinkers();
 
-	Super::Tick(DeltaTime);
 
 	DrawDebugString(GetWorld(), FVector(0, 0, 100), GetEnumText(GetLocalRole()), this, FColor::White, DeltaTime);
 }
 
+void AVRCharacter::CalculateHMDToCharLocation()
+{
+	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
+	NewCameraOffset.Z = 0;
+	HMDToCharLocation = NewCameraOffset;
+	Server_HMDSyncLocation(NewCameraOffset);
+}
+
 void AVRCharacter::HMDSyncLocation()
 {
-	// 헤드마운트 디스플레이에 따른 캐릭터 위치 조정
-	FVector NewMeshOffset = GetMesh()->GetComponentLocation() - GetActorLocation();
-	NewMeshOffset.Z = 0;
-	AddActorWorldOffset(NewMeshOffset);
-	VRRoot->AddWorldOffset(-NewMeshOffset);
-	//Server_HMDSyncLocation(GetActorLocation()); // 나먼저 시뮬레이션 하고, 서버에도 시뮬레이션 요청
+	AddActorWorldOffset(HMDToCharLocation);
+	VRRoot->AddWorldOffset(-HMDToCharLocation);
 }
-//
-//void AVRCharacter::Server_HMDSyncLocation_Implementation(FVector NewLocation)
-//{
-//	RepLocation = NewLocation;
-//}
-//
+
+void AVRCharacter::Server_HMDSyncLocation_Implementation(FVector NewLocation)
+{
+	HMDToCharLocation = NewLocation;
+}
+
 //bool AVRCharacter::Server_HMDSyncLocation_Validate(FVector NewLocation)
 //{
 //	return true;

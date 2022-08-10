@@ -30,7 +30,6 @@ void APCCharacter::BeginPlay()
 void APCCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void APCCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

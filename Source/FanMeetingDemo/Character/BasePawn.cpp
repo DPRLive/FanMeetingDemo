@@ -48,11 +48,12 @@ void ABasePawn::PCStart()
 void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int Type)
 {
 	APlayerController* MyController = Cast<APlayerController>(NowPawn->GetController());
+	FVector SpawnLocation = NowPawn->GetActorLocation();
 	ACharacter* Character = nullptr;
 	if (Type == 0)
-		Character = Cast<ACharacter>(GetWorld()->SpawnActor(VRCharacterClass));
+		Character = Cast<ACharacter>(GetWorld()->SpawnActor(VRCharacterClass, &SpawnLocation));
 	else if (Type == 1)
-		Character = Cast<ACharacter>(GetWorld()->SpawnActor(PCCharacterClass));
+		Character = Cast<ACharacter>(GetWorld()->SpawnActor(PCCharacterClass, &SpawnLocation));
 	
 	MyController->UnPossess();
 	MyController->Possess(Character);

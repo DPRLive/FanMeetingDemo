@@ -32,10 +32,12 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	void CalculateHMDToCharLocation();
+
 	void HMDSyncLocation();
 
-	//UFUNCTION(Server, Reliable, WithValidation)
-	//	void Server_HMDSyncLocation(FVector NewLocation);
+	UFUNCTION(Server, Unreliable)
+		void Server_HMDSyncLocation(FVector NewLocation);
 
 	//UPROPERTY(ReplicatedUsing = OnRep_RepLocation)
 	//	FVector RepLocation;
@@ -64,6 +66,8 @@ private:
 		class UPostProcessComponent* PostProcessComponent;
 
 	// Property
+	FVector HMDToCharLocation = FVector::ZeroVector;
+
 	UPROPERTY()
 		class UMaterialInstanceDynamic* BlinkerMaterialInstance;
 
