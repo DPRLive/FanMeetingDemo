@@ -37,6 +37,9 @@ private:
 	UPROPERTY(EditAnywhere)
 		class USpringArmComponent* CameraSpringArm;
 
+	UPROPERTY(EditAnywhere)
+		class UWidgetComponent* NamePlate;
+
 	//Movement
 	UFUNCTION()
 		void MoveForward(float Scale);

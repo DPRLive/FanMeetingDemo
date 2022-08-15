@@ -1,6 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+//custom header
+#include "../FanMeetingGameInstance.h"
+#include "../FanMeetingPlayerState.h"
 
+//unreal header
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "BasePawn.h"
 
@@ -14,6 +19,25 @@ void ABasePawn::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		FTimerHandle WaitHandle;
+		// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
+		GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
+			{
+				UFanMeetingGameInstance* FMGameInstance = Cast<UFanMeetingGameInstance>(GetGameInstance());
+				AFanMeetingPlayerState* FMPlayerState = Cast<AFanMeetingPlayerState>(GetPlayerState());
+
+				if (FMGameInstance != nullptr && FMPlayerState != nullptr)
+				{
+					FMPlayerState->SetPlayerName(FMGameInstance->GetPlayerName());
+					FMPlayerState->SetPlatformType(FMGameInstance->GetPlatformType());
+				}
+
+				if (FMPlayerState->GetPlatformType() == 0) PCStart();
+				else if (FMPlayerState->GetPlatformType() == 1) VRStart();
+			}), 0.1, false);
+	}
 }
 
 void ABasePawn::Tick(float DeltaTime)

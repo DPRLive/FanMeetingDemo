@@ -5,8 +5,9 @@
 
 void UMenuWidget::Setup()
 {
-	this->AddToViewport();
+	bSetup = true;
 
+	this->AddToViewport();
 	this->bIsFocusable = true;
 	FInputModeUIOnly InputMode;
 	InputMode.SetWidgetToFocus(this->TakeWidget());
@@ -20,6 +21,8 @@ void UMenuWidget::Setup()
 
 void UMenuWidget::Teardown()
 {
+	bSetup = false;
+
 	FInputModeGameOnly InputMode;
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (!ensure(PlayerController != nullptr)) return;

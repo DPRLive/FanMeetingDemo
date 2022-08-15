@@ -17,4 +17,7 @@ class FANMEETINGDEMO_API UMenuWidget : public UUserWidget
 public:
 	void Setup();
 	void Teardown();
+	bool IsSetup() { return bSetup; }
+private:
+	bool bSetup = false;
 };

@@ -70,14 +70,15 @@ void AVRCharacter::BeginPlay()
 	}	
 	// Super::BeginPlay를 나중에 호출해야 cpp코드가 블루프린트보다 먼저 호출됨.
 	Super::BeginPlay();
+	OnResetVR();
 }
 
 void AVRCharacter::Tick(float DeltaTime)
 {
 	//if (HasAuthority())
 	Super::Tick(DeltaTime);
-	CalculateHMDToCharLocation();
-	HMDSyncLocation();
+	//CalculateHMDToCharLocation();
+	//HMDSyncLocation();
 
 	if (UseBlinker) UpdateBlinkers();
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "MenuWidget.h"
+#include "MainMenuUI.h"
 #include "Components/WidgetInteractionComponent.h"
 #include "MotionControllerComponent.h"
 #include "Camera/CameraComponent.h"
@@ -41,7 +41,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 		UWidgetInteractionComponent* Pointer;
 
-	TSubclassOf<UMenuWidget> MainMenu;
+	TSubclassOf<UMainMenuUI> MainMenu;
 
-	void TriggerRight();
+	void TriggerRightPressed();
+	void TriggerRightReleased();
 };
