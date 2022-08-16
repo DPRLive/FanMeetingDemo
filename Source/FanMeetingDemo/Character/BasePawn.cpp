@@ -34,8 +34,8 @@ void ABasePawn::BeginPlay()
 					FMPlayerState->SetPlatformType(FMGameInstance->GetPlatformType());
 				}
 
-				if (FMPlayerState->GetPlatformType() == 0) PCStart();
-				else if (FMPlayerState->GetPlatformType() == 1) VRStart();
+				if (FMGameInstance->GetPlatformType() == 0) PCStart();
+				else if (FMGameInstance->GetPlatformType() == 1) VRStart();
 			}), 0.1, false);
 	}
 }
@@ -57,7 +57,7 @@ void ABasePawn::VRStart()
 {
 	if (VRCharacterClass != nullptr)
 	{
-		Server_SwapCharacter(this, 0);
+		Server_SwapCharacter(this,1);
 	}
 }
 
@@ -65,7 +65,7 @@ void ABasePawn::PCStart()
 {
 	if (PCCharacterClass != nullptr)
 	{
-		Server_SwapCharacter(this, 1);
+		Server_SwapCharacter(this, 0);
 	}
 }
 
@@ -74,9 +74,9 @@ void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int Type)
 	APlayerController* MyController = Cast<APlayerController>(NowPawn->GetController());
 	FVector SpawnLocation = NowPawn->GetActorLocation();
 	ACharacter* Character = nullptr;
-	if (Type == 0)
+	if (Type == 1)
 		Character = Cast<ACharacter>(GetWorld()->SpawnActor(VRCharacterClass, &SpawnLocation));
-	else if (Type == 1)
+	else if (Type == 0)
 		Character = Cast<ACharacter>(GetWorld()->SpawnActor(PCCharacterClass, &SpawnLocation));
 	
 	MyController->UnPossess();

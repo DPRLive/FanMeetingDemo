@@ -23,7 +23,6 @@ void UMainMenuUI::PCBtnClicked()
 {
 	UFanMeetingGameInstance* GameInstance = Cast<UFanMeetingGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (GameInstance == nullptr) return;
-	
 	GameInstance->SetPlayerName("PCMan");
 	GameInstance->SetPlatformType(0);
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("127.0.0.1"));
@@ -35,10 +34,8 @@ void UMainMenuUI::VRBtnClicked()
 {
 	UFanMeetingGameInstance* GameInstance = Cast<UFanMeetingGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (GameInstance == nullptr) return;
-	
 	GameInstance->SetPlayerName("VRMan");
 	GameInstance->SetPlatformType(1);
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("127.0.0.1"));
 	if (IsSetup()) Teardown();
-
 }

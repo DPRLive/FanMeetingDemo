@@ -33,21 +33,15 @@ void AMainMenuPawn::BeginPlay()
 		&& UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled();
 
 	// PC와 VR 따로 패키징 해야할거같음 ㅠ
-	if (!UseHMD)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Not use hmd"));
-		if (MainMenu != nullptr)
-		{
-			UMenuWidget* MainMenuUI = CreateWidget<UMenuWidget>(GetWorld(), MainMenu);
-			MainMenuUI->Setup();
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("use hmd"));
-		RightController->SetShowDeviceModel(true);
-		RightController->SetTrackingSource(EControllerHand::Right);
-	}
+	//if (!UseHMD)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Not use hmd"));
+	//	
+	//}
+	//else
+	//{
+
+	//}
 }
 
 void AMainMenuPawn::Tick(float DeltaTime)
@@ -60,17 +54,30 @@ void AMainMenuPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction(TEXT("PCStart"), IE_Pressed, this, &AMainMenuPawn::PCStart);
 	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Pressed, this, &AMainMenuPawn::TriggerRightPressed);
 	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Released, this, &AMainMenuPawn::TriggerRightReleased);
 }
 
 void AMainMenuPawn::TriggerRightPressed()
 {
+	UE_LOG(LogTemp, Warning, TEXT("use hmd"));
+	RightController->SetShowDeviceModel(true);
+	RightController->SetTrackingSource(EControllerHand::Right);
 	Pointer->PressPointerKey(EKeys::LeftMouseButton);
 }
 
 void AMainMenuPawn::TriggerRightReleased()
 {
 	Pointer->ReleasePointerKey(EKeys::LeftMouseButton);
+}
+
+void AMainMenuPawn::PCStart()
+{
+	if (MainMenu != nullptr)
+	{
+		UMenuWidget* MainMenuUI = CreateWidget<UMenuWidget>(GetWorld(), MainMenu);
+		MainMenuUI->Setup();
+	}
 }
 

@@ -18,8 +18,21 @@ class FANMEETINGDEMO_API AVRCharacter : public ACharacter
 
 public:
 	AVRCharacter();
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
+	// NamePlates
+	void NamePlateUpdate();
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+		FString PlayerName;
+
+	UPROPERTY(ReplicatedUsing = OnRep_PlayerNameRef, BlueprintReadWrite)
+		FString PlayerNameRef;
+
+	UFUNCTION()
+		void OnRep_PlayerNameRef();
+
 	// Components (BlueprintReadWrite)
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class UCameraComponent* Camera;
@@ -65,6 +78,9 @@ private:
 	UPROPERTY() // Blinker를 위한 포스트프로세스 컴포넌트
 		class UPostProcessComponent* PostProcessComponent;
 
+	UPROPERTY(EditAnywhere)
+		class UWidgetComponent* NamePlate;
+
 	// Property
 	FVector HMDToCharLocation = FVector::ZeroVector;
 
@@ -76,6 +92,10 @@ private:
 
 	UPROPERTY(EditAnywhere, category = "Blinkers") //동적인 Blink를 위한 커브 
 		class UCurveFloat* RadiusVsVelocity;
+
+	// for GetAllActorsOfClass
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<AActor> PlayerControllerClass;
 
 	// Function
 	UFUNCTION()

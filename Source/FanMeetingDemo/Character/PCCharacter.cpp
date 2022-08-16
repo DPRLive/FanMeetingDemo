@@ -4,6 +4,8 @@
 #include "../UI/NamePlate.h"
 #include "../FanMeetingPlayerState.h"
 // unreal header
+#include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -32,24 +34,42 @@ void APCCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	CameraSpringArm->SetRelativeLocation(FVector(0, EyeForwardPosition, CharacterHeight));
-	NamePlate->AddLocalOffset(FVector(0, 0, CharacterHeight / 2));
+	NamePlate->AddLocalOffset(FVector(0, 0, (CharacterHeight / 2)) + 20);
 
-	// TODO: other Player State 접근하는방법 알아야할듯.
-	if (GetLocalRole() == ROLE_AutonomousProxy || GetLocalRole() == ROLE_SimulatedProxy)
+	FTimerHandle WaitHandle;
+	// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
+	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			NamePlateUpdate();
+		}), 0.1, false);
+}
+
+void APCCharacter::NamePlateUpdate()
+{
+	if (IsLocallyControlled()) NamePlate->SetVisibility(false);
+	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
+	if (HasAuthority())
 	{
-		FTimerHandle WaitHandle;
-		GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
-			{
-				AFanMeetingPlayerState* FMPlayerState = Cast<AFanMeetingPlayerState>(GetPlayerState());
-
-				if (FMPlayerState != nullptr)
-				{
-					FString PlayerName = FMPlayerState->GetPlayerName();
-					Cast<UNamePlate>(NamePlate->GetWidget())->SetName(PlayerName);
-				}
-
-			}), 0.1, false);
+		TArray<AActor*> ActorArray;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlayerControllerClass, ActorArray);
+		for (int32 i = 0; i < ActorArray.Num(); i++)
+		{
+			PlayerNameRef = Cast<APlayerController>(ActorArray[i])->PlayerState->GetPlayerName();
+			OnRep_PlayerNameRef();
+		}
 	}
+	else
+	{
+		Cast<UNamePlate>(NamePlate->GetWidget())->SetPCCharacterRef(this);
+	}
+}
+
+void APCCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APCCharacter, PlayerName);
+	DOREPLIFETIME(APCCharacter, PlayerNameRef);
 }
 
 void APCCharacter::Tick(float DeltaTime)
@@ -68,6 +88,11 @@ void APCCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APCCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &APCCharacter::StopJumping);
+}
+
+void APCCharacter::OnRep_PlayerNameRef()
+{
+	PlayerName = PlayerNameRef;
 }
 
 void APCCharacter::MoveForward(float Scale)

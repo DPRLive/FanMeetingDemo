@@ -17,12 +17,30 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void NamePlateUpdate();
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+		FString PlayerName;
+
+	UPROPERTY(ReplicatedUsing = OnRep_PlayerNameRef, BlueprintReadWrite)
+		FString PlayerNameRef;
+
+	UFUNCTION()
+		void OnRep_PlayerNameRef();
+
 public:	
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+
+	// for GetAllActorsOfClass
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<AActor> PlayerControllerClass;
+
 	// setting
 	UPROPERTY(EditAnywhere, category = "Setting")
 		float EyeForwardPosition = 0;

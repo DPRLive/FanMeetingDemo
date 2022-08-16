@@ -1,11 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 //custom header
-
+#include "../UI/NamePlate.h"
+#include "../FanMeetingPlayerState.h"
 
 //unreal header
-#include "DrawDebugHelpers.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/WidgetComponent.h"
+
+#include "DrawDebugHelpers.h"
 
 #include "Animation/AnimInstance.h"
 #include "MotionControllerComponent.h"
@@ -35,6 +38,10 @@ AVRCharacter::AVRCharacter()
 	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
 	PostProcessComponent->bUnbound = false;
 	PostProcessComponent->SetupAttachment(GetRootComponent());
+
+	NamePlate = CreateDefaultSubobject<UWidgetComponent>(TEXT("NamePlate"));
+	NamePlate->SetDrawSize(FVector2D(500, 80));
+	NamePlate->SetupAttachment(Camera);
 }
 
 FString GetEnumText(ENetRole Role)
@@ -57,7 +64,7 @@ FString GetEnumText(ENetRole Role)
 void AVRCharacter::BeginPlay()
 {
 	VRRoot->AddLocalOffset(FVector(0, 0, -88));
-
+	NamePlate->AddLocalOffset(FVector(0, 0, 30));
 	ControllerLeft->SetTrackingSource(EControllerHand::Left);
 	ControllerRight->SetTrackingSource(EControllerHand::Right);
 	//멀미 방지를 위한 Blinkers
@@ -71,6 +78,46 @@ void AVRCharacter::BeginPlay()
 	// Super::BeginPlay를 나중에 호출해야 cpp코드가 블루프린트보다 먼저 호출됨.
 	Super::BeginPlay();
 	OnResetVR();
+
+	FTimerHandle WaitHandle;
+	// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
+	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			NamePlateUpdate();
+		}), 0.1, false);
+}
+
+void AVRCharacter::NamePlateUpdate()
+{
+	if (IsLocallyControlled()) NamePlate->SetVisibility(false);
+	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
+	if (HasAuthority())
+	{
+		TArray<AActor*> ActorArray;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlayerControllerClass, ActorArray);
+		for (int32 i = 0; i < ActorArray.Num(); i++)
+		{
+			PlayerNameRef = Cast<APlayerController>(ActorArray[i])->PlayerState->GetPlayerName();
+			OnRep_PlayerNameRef();
+		}
+	}
+	else
+	{
+		Cast<UNamePlate>(NamePlate->GetWidget())->SetVRCharacterRef(this);
+	}
+}
+
+void AVRCharacter::OnRep_PlayerNameRef()
+{
+	PlayerName = PlayerNameRef;
+}
+
+void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AVRCharacter, PlayerName);
+	DOREPLIFETIME(AVRCharacter, PlayerNameRef);
 }
 
 void AVRCharacter::Tick(float DeltaTime)
