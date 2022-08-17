@@ -29,8 +29,8 @@ void AMainMenuPawn::BeginPlay()
 	Super::BeginPlay();
 	
 	// HMD를 사용하는지 여부
-	UseHMD = UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayConnected()
-		&& UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled();
+	//UseHMD = UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayConnected()
+	//	&& UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled();
 
 	// PC와 VR 따로 패키징 해야할거같음 ㅠ
 	//if (!UseHMD)

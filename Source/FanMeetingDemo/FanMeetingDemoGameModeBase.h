@@ -13,11 +13,4 @@ UCLASS()
 class FANMEETINGDEMO_API AFanMeetingDemoGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-//
-//public:
-//	virtual void PostLogin(APlayerController* NewPlayer) override;
-//
-//private:
-//	FString PlayerName;
-//	FString PlatformType;
 };

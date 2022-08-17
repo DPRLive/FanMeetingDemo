@@ -29,9 +29,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 		AVRCharacter* VRCharacterRef;
-
-	UPROPERTY(BlueprintReadOnly)
-		APlayerController* PlayerControllerRef;
 private:
 
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))

@@ -45,12 +45,12 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	void CalculateHMDToCharLocation();
+	/*void CalculateHMDToCharLocation();
 
 	void HMDSyncLocation();
 
 	UFUNCTION(Server, Unreliable)
-		void Server_HMDSyncLocation(FVector NewLocation);
+		void Server_HMDSyncLocation(FVector NewLocation);*/
 
 	//UPROPERTY(ReplicatedUsing = OnRep_RepLocation)
 	//	FVector RepLocation;
@@ -82,7 +82,7 @@ private:
 		class UWidgetComponent* NamePlate;
 
 	// Property
-	FVector HMDToCharLocation = FVector::ZeroVector;
+	//FVector HMDToCharLocation = FVector::ZeroVector;
 
 	UPROPERTY()
 		class UMaterialInstanceDynamic* BlinkerMaterialInstance;
@@ -100,6 +100,9 @@ private:
 	// Function
 	UFUNCTION()
 		void OnResetVR();
+
+	UFUNCTION()
+		void SetBlink();
 
 	void UpdateBlinkers();
 

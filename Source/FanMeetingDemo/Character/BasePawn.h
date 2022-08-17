@@ -29,12 +29,6 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class ACharacter> VRCharacterClass;
 
-	UFUNCTION()
-		void VRStart();
-
-	UFUNCTION()
-		void PCStart();
-
 	UFUNCTION(Server, Unreliable) // 0 = VR, 1 = PC
 		void Server_SwapCharacter(APawn* NowPawn, int Type);
 };

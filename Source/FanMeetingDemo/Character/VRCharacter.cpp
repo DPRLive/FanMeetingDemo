@@ -7,10 +7,6 @@
 //unreal header
 #include "Net/UnrealNetwork.h"
 #include "Components/WidgetComponent.h"
-
-#include "DrawDebugHelpers.h"
-
-#include "Animation/AnimInstance.h"
 #include "MotionControllerComponent.h"
 #include "Components/PostProcessComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
@@ -40,34 +36,17 @@ AVRCharacter::AVRCharacter()
 	PostProcessComponent->SetupAttachment(GetRootComponent());
 
 	NamePlate = CreateDefaultSubobject<UWidgetComponent>(TEXT("NamePlate"));
-	NamePlate->SetDrawSize(FVector2D(500, 80));
+	NamePlate->SetDrawSize(FVector2D(300, 100));
 	NamePlate->SetupAttachment(Camera);
-}
-
-FString GetEnumText(ENetRole Role)
-{
-	switch (Role)
-	{
-	case ROLE_None:
-		return "None";
-	case ROLE_SimulatedProxy:
-		return "SimulatedProxy";
-	case ROLE_AutonomousProxy:
-		return "AutonomousProxy";
-	case ROLE_Authority:
-		return "Authority";
-	default:
-		return "ERROR";
-	}
 }
 
 void AVRCharacter::BeginPlay()
 {
 	VRRoot->AddLocalOffset(FVector(0, 0, -88));
-	NamePlate->AddLocalOffset(FVector(0, 0, 30));
+	NamePlate->AddLocalOffset(FVector(0, 0, 20));
 	ControllerLeft->SetTrackingSource(EControllerHand::Left);
 	ControllerRight->SetTrackingSource(EControllerHand::Right);
-	//멀미 방지를 위한 Blinkers
+
 	if (BlinkerMaterialBase != nullptr && PostProcessComponent != nullptr)
 	{
 		// 부모를 기준으로 하는 동적 Material 생성
@@ -122,35 +101,32 @@ void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 void AVRCharacter::Tick(float DeltaTime)
 {
-	//if (HasAuthority())
 	Super::Tick(DeltaTime);
+	//if (HasAuthority())
 	//CalculateHMDToCharLocation();
 	//HMDSyncLocation();
 
 	if (UseBlinker) UpdateBlinkers();
-
-
-	DrawDebugString(GetWorld(), FVector(0, 0, 100), GetEnumText(GetLocalRole()), this, FColor::White, DeltaTime);
 }
 
-void AVRCharacter::CalculateHMDToCharLocation()
-{
-	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
-	NewCameraOffset.Z = 0;
-	HMDToCharLocation = NewCameraOffset;
-	Server_HMDSyncLocation(NewCameraOffset);
-}
-
-void AVRCharacter::HMDSyncLocation()
-{
-	AddActorWorldOffset(HMDToCharLocation);
-	VRRoot->AddWorldOffset(-HMDToCharLocation);
-}
-
-void AVRCharacter::Server_HMDSyncLocation_Implementation(FVector NewLocation)
-{
-	HMDToCharLocation = NewLocation;
-}
+//void AVRCharacter::CalculateHMDToCharLocation()
+//{
+//	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
+//	NewCameraOffset.Z = 0;
+//	HMDToCharLocation = NewCameraOffset;
+//	Server_HMDSyncLocation(NewCameraOffset);
+//}
+//
+//void AVRCharacter::HMDSyncLocation()
+//{
+//	AddActorWorldOffset(HMDToCharLocation);
+//	VRRoot->AddWorldOffset(-HMDToCharLocation);
+//}
+//
+//void AVRCharacter::Server_HMDSyncLocation_Implementation(FVector NewLocation)
+//{
+//	HMDToCharLocation = NewLocation;
+//}
 
 //bool AVRCharacter::Server_HMDSyncLocation_Validate(FVector NewLocation)
 //{
@@ -200,11 +176,18 @@ void AVRCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AVRCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AVRCharacter::StopJumping);
 	PlayerInputComponent->BindAction(TEXT("OnResetVR"), IE_Pressed, this, &AVRCharacter::OnResetVR);
+	PlayerInputComponent->BindAction(TEXT("SetBlink"), IE_Pressed, this, &AVRCharacter::SetBlink);
 }
 
 void AVRCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+}
+
+void AVRCharacter::SetBlink()
+{
+	if (UseBlinker) UseBlinker = false;
+	else UseBlinker = true;
 }
 
 void AVRCharacter::MoveForward(float Scale)

@@ -13,14 +13,4 @@ UCLASS()
 class FANMEETINGDEMO_API AFanMeetingPlayerState : public APlayerState
 {
 	GENERATED_BODY()
-
-public:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	void SetPlatformType(const uint8& I);
-	
-	uint8 GetPlatformType() const;
-private:
-	UPROPERTY(Replicated)
-		uint8 PlatformType;
 };

@@ -26,16 +26,10 @@ void ABasePawn::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
 			{
 				UFanMeetingGameInstance* FMGameInstance = Cast<UFanMeetingGameInstance>(GetGameInstance());
-				AFanMeetingPlayerState* FMPlayerState = Cast<AFanMeetingPlayerState>(GetPlayerState());
 
-				if (FMGameInstance != nullptr && FMPlayerState != nullptr)
-				{
-					FMPlayerState->SetPlayerName(FMGameInstance->GetPlayerName());
-					FMPlayerState->SetPlatformType(FMGameInstance->GetPlatformType());
-				}
-
-				if (FMGameInstance->GetPlatformType() == 0) PCStart();
-				else if (FMGameInstance->GetPlatformType() == 1) VRStart();
+				Cast<APlayerController>(GetController())->SetName(FMGameInstance->GetPlayerName());
+				if (FMGameInstance->GetPlatformType() == 0) Server_SwapCharacter(this, 0);
+				else if (FMGameInstance->GetPlatformType() == 1) Server_SwapCharacter(this, 1);
 			}), 0.1, false);
 	}
 }
@@ -49,24 +43,6 @@ void ABasePawn::Tick(float DeltaTime)
 void ABasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAction(TEXT("PCStart"), IE_Pressed, this, &ABasePawn::PCStart);
-	PlayerInputComponent->BindAction(TEXT("VRStart"), IE_Pressed, this, &ABasePawn::VRStart);
-}
-
-void ABasePawn::VRStart()
-{
-	if (VRCharacterClass != nullptr)
-	{
-		Server_SwapCharacter(this,1);
-	}
-}
-
-void ABasePawn::PCStart()
-{
-	if (PCCharacterClass != nullptr)
-	{
-		Server_SwapCharacter(this, 0);
-	}
 }
 
 void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int Type)
