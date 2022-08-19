@@ -13,9 +13,12 @@ UCLASS()
 class FANMEETINGDEMO_API UFanMeetingGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-private:
-	FString PlayerName;
-	uint8 PlatformType; // 0:PC, 1:VR
+
+protected:
+	UPROPERTY(BlueprintReadWrite)
+		FString PlayerName ="UNKONWN_NAME";
+	UPROPERTY(BlueprintReadWrite)
+		uint8 PlatformType; // 0:PC, 1:VR
 
 public:
 	void SetPlayerName(const FString& S) { PlayerName = S; }

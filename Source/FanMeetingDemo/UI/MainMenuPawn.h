@@ -39,12 +39,20 @@ private:
 		UMotionControllerComponent* RightController;
 
 	UPROPERTY(VisibleAnywhere)
-		UWidgetInteractionComponent* Pointer;
+		UMotionControllerComponent* LeftController;
+
+	UPROPERTY(VisibleAnywhere)
+		UWidgetInteractionComponent* RightPointer;
+
+	UPROPERTY(VisibleAnywhere)
+		UWidgetInteractionComponent* LeftPointer;
 
 	TSubclassOf<UMainMenuUI> MainMenu;
 
 	void TriggerRightPressed();
+	void TriggerLeftPressed();
 	void TriggerRightReleased();
+	void TriggerLeftReleased();
 
 	// depre
 	void PCStart();

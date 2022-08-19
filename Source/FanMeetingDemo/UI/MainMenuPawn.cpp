@@ -16,10 +16,16 @@ AMainMenuPawn::AMainMenuPawn()
 	RightController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightController"));
 	RightController->SetupAttachment(VRRoot);
 
-	Pointer = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("Pointer"));
-	Pointer->SetupAttachment(RightController);
+	LeftController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("LeftController"));
+	LeftController->SetupAttachment(VRRoot);
 
-	ConstructorHelpers::FClassFinder<UMainMenuUI> MainMenuUIBPClass(TEXT("/Game/UI/WBP_MainMenuUI"));
+	RightPointer = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("RightPointer"));
+	RightPointer->SetupAttachment(RightController);
+
+	LeftPointer = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("LeftPointer"));
+	LeftPointer->SetupAttachment(LeftController);
+
+	ConstructorHelpers::FClassFinder<UMainMenuUI> MainMenuUIBPClass(TEXT("/Game/UI/WBP_LobbyUI"));
 	if (MainMenuUIBPClass.Class == nullptr) return;
 	MainMenu = MainMenuUIBPClass.Class;
 }
@@ -28,6 +34,18 @@ void AMainMenuPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (RightController != nullptr)
+	{
+		RightController->SetShowDeviceModel(true);
+		RightController->SetTrackingSource(EControllerHand::Right);
+	}
+
+	if (LeftController != nullptr)
+	{
+		LeftController->SetShowDeviceModel(true);
+		LeftController->SetTrackingSource(EControllerHand::Left);
+	}
+
 	// HMD를 사용하는지 여부
 	//UseHMD = UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayConnected()
 	//	&& UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled();
@@ -57,19 +75,28 @@ void AMainMenuPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction(TEXT("PCStart"), IE_Pressed, this, &AMainMenuPawn::PCStart);
 	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Pressed, this, &AMainMenuPawn::TriggerRightPressed);
 	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Released, this, &AMainMenuPawn::TriggerRightReleased);
+	PlayerInputComponent->BindAction(TEXT("TriggerLeft"), IE_Pressed, this, &AMainMenuPawn::TriggerLeftPressed);
+	PlayerInputComponent->BindAction(TEXT("TriggerLeft"), IE_Released, this, &AMainMenuPawn::TriggerLeftReleased);
 }
 
 void AMainMenuPawn::TriggerRightPressed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("use hmd"));
-	RightController->SetShowDeviceModel(true);
-	RightController->SetTrackingSource(EControllerHand::Right);
-	Pointer->PressPointerKey(EKeys::LeftMouseButton);
+	RightPointer->PressPointerKey(EKeys::LeftMouseButton);
+}
+
+void AMainMenuPawn::TriggerLeftPressed()
+{
+	LeftPointer->PressPointerKey(EKeys::LeftMouseButton);
 }
 
 void AMainMenuPawn::TriggerRightReleased()
 {
-	Pointer->ReleasePointerKey(EKeys::LeftMouseButton);
+	RightPointer->ReleasePointerKey(EKeys::LeftMouseButton);
+}
+
+void AMainMenuPawn::TriggerLeftReleased()
+{
+	LeftPointer->ReleasePointerKey(EKeys::LeftMouseButton);
 }
 
 void AMainMenuPawn::PCStart()

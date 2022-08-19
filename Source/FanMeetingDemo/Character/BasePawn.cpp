@@ -12,7 +12,6 @@
 ABasePawn::ABasePawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void ABasePawn::BeginPlay()
