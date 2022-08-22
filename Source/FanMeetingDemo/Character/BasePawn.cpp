@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "BasePawn.h"
 //custom header
 #include "../FanMeetingGameInstance.h"
 #include "../FanMeetingPlayerState.h"
@@ -7,7 +7,7 @@
 //unreal header
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
-#include "BasePawn.h"
+
 
 ABasePawn::ABasePawn()
 {

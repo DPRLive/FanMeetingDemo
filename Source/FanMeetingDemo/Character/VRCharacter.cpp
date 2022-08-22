@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "VRCharacter.h"
 //custom header
 #include "../UI/NamePlate.h"
 #include "../FanMeetingPlayerState.h"
@@ -13,7 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
-#include "VRCharacter.h"
+
 
 AVRCharacter::AVRCharacter()
 {
@@ -72,13 +72,18 @@ void AVRCharacter::NamePlateUpdate()
 	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
 	if (HasAuthority())
 	{
-		TArray<AActor*> ActorArray;
+		/*TArray<AActor*> ActorArray;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlayerControllerClass, ActorArray);
+		ActorArray.Sort([](const AActor& A, const AActor& B) {
+			return A.GetName() > B.GetName();
+			});
 		for (int32 i = 0; i < ActorArray.Num(); i++)
 		{
 			PlayerNameRef = Cast<APlayerController>(ActorArray[i])->PlayerState->GetPlayerName();
 			OnRep_PlayerNameRef();
-		}
+		}*/
+		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
+		OnRep_PlayerNameRef();
 	}
 	else
 	{
@@ -102,56 +107,8 @@ void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void AVRCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//if (HasAuthority())
-	//CalculateHMDToCharLocation();
-	//HMDSyncLocation();
-
 	if (UseBlinker) UpdateBlinkers();
 }
-
-//void AVRCharacter::CalculateHMDToCharLocation()
-//{
-//	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
-//	NewCameraOffset.Z = 0;
-//	HMDToCharLocation = NewCameraOffset;
-//	Server_HMDSyncLocation(NewCameraOffset);
-//}
-//
-//void AVRCharacter::HMDSyncLocation()
-//{
-//	AddActorWorldOffset(HMDToCharLocation);
-//	VRRoot->AddWorldOffset(-HMDToCharLocation);
-//}
-//
-//void AVRCharacter::Server_HMDSyncLocation_Implementation(FVector NewLocation)
-//{
-//	HMDToCharLocation = NewLocation;
-//}
-
-//bool AVRCharacter::Server_HMDSyncLocation_Validate(FVector NewLocation)
-//{
-//	return true;
-//}
-//
-//void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-//{
-//	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-//	DOREPLIFETIME(AVRCharacter, RepLocation);
-//}
-//
-//void AVRCharacter::OnRep_RepLocation() //클라이언트 한테만 전달되기 때문에 서버 클라이언트인지 확인할 필요가없음
-//{
-//	switch (GetLocalRole())
-//	{
-//	case ROLE_AutonomousProxy:
-//		break;
-//	case ROLE_SimulatedProxy:
-//		SetActorLocation(RepLocation);
-//		break;
-//	default:
-//		break;
-//	}
-//}
 
 void AVRCharacter::UpdateBlinkers()
 {

@@ -45,18 +45,6 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	/*void CalculateHMDToCharLocation();
-
-	void HMDSyncLocation();
-
-	UFUNCTION(Server, Unreliable)
-		void Server_HMDSyncLocation(FVector NewLocation);*/
-
-	//UPROPERTY(ReplicatedUsing = OnRep_RepLocation)
-	//	FVector RepLocation;
-
-	//UFUNCTION()
-	//	void OnRep_RepLocation();
 
 public:	
 	virtual void Tick(float DeltaTime) override;

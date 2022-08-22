@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "MainMenuPawn.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
+
 
 AMainMenuPawn::AMainMenuPawn()
 {
@@ -24,16 +24,12 @@ AMainMenuPawn::AMainMenuPawn()
 
 	LeftPointer = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("LeftPointer"));
 	LeftPointer->SetupAttachment(LeftController);
-
-	ConstructorHelpers::FClassFinder<UMainMenuUI> MainMenuUIBPClass(TEXT("/Game/UI/WBP_LobbyUI"));
-	if (MainMenuUIBPClass.Class == nullptr) return;
-	MainMenu = MainMenuUIBPClass.Class;
 }
 
 void AMainMenuPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (RightController != nullptr)
 	{
 		RightController->SetShowDeviceModel(true);
@@ -45,21 +41,6 @@ void AMainMenuPawn::BeginPlay()
 		LeftController->SetShowDeviceModel(true);
 		LeftController->SetTrackingSource(EControllerHand::Left);
 	}
-
-	// HMD를 사용하는지 여부
-	//UseHMD = UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayConnected()
-	//	&& UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled();
-
-	// PC와 VR 따로 패키징 해야할거같음 ㅠ
-	//if (!UseHMD)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Not use hmd"));
-	//	
-	//}
-	//else
-	//{
-
-	//}
 }
 
 void AMainMenuPawn::Tick(float DeltaTime)
@@ -72,7 +53,6 @@ void AMainMenuPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction(TEXT("PCStart"), IE_Pressed, this, &AMainMenuPawn::PCStart);
 	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Pressed, this, &AMainMenuPawn::TriggerRightPressed);
 	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Released, this, &AMainMenuPawn::TriggerRightReleased);
 	PlayerInputComponent->BindAction(TEXT("TriggerLeft"), IE_Pressed, this, &AMainMenuPawn::TriggerLeftPressed);
@@ -97,14 +77,5 @@ void AMainMenuPawn::TriggerRightReleased()
 void AMainMenuPawn::TriggerLeftReleased()
 {
 	LeftPointer->ReleasePointerKey(EKeys::LeftMouseButton);
-}
-
-void AMainMenuPawn::PCStart()
-{
-	if (MainMenu != nullptr)
-	{
-		UMenuWidget* MainMenuUI = CreateWidget<UMenuWidget>(GetWorld(), MainMenu);
-		MainMenuUI->Setup();
-	}
 }
 

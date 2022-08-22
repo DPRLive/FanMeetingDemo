@@ -54,6 +54,4 @@ private:
 	void TriggerRightReleased();
 	void TriggerLeftReleased();
 
-	// depre
-	void PCStart();
 };
