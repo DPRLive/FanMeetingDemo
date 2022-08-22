@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "PCCharacter.h"
 // custom header
 #include "../UI/NamePlate.h"
 #include "../FanMeetingPlayerState.h"
@@ -9,7 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "PCCharacter.h"
+
 
 
 APCCharacter::APCCharacter()
@@ -50,14 +50,19 @@ void APCCharacter::NamePlateUpdate()
 	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
 	if (HasAuthority())
 	{
-		TArray<AActor*> ActorArray;
+		/*TArray<AActor*> ActorArray;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlayerControllerClass, ActorArray);
+		ActorArray.Sort([](const AActor& A, const AActor& B) {
+			return A.GetName() > B.GetName();
+			});
 		for (int32 i = 0; i < ActorArray.Num(); i++)
 		{
 			PlayerNameRef = Cast<APlayerController>(ActorArray[i])->PlayerState->GetPlayerName();
 			UE_LOG(LogTemp, Warning, TEXT("PlayerNameRef : %s"), *PlayerNameRef);
 			OnRep_PlayerNameRef();
-		}
+		}*/
+		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
+		OnRep_PlayerNameRef();
 	}
 	else
 	{

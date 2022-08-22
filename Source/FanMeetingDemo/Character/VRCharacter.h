@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 //custom header
@@ -10,6 +8,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "VRCharacter.generated.h"
+
 
 UCLASS()
 class FANMEETINGDEMO_API AVRCharacter : public ACharacter
@@ -45,20 +44,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	/*void CalculateHMDToCharLocation();
 
-	void HMDSyncLocation();
-
-	UFUNCTION(Server, Unreliable)
-		void Server_HMDSyncLocation(FVector NewLocation);*/
-
-	//UPROPERTY(ReplicatedUsing = OnRep_RepLocation)
-	//	FVector RepLocation;
-
-	//UFUNCTION()
-	//	void OnRep_RepLocation();
-
-public:	
+public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -109,7 +96,7 @@ private:
 	//Movement
 	UFUNCTION()
 		void MoveForward(float Scale);
-	
+
 	UFUNCTION()
 		void MoveRight(float Scale);
 
