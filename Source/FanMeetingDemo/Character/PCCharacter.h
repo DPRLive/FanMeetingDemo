@@ -39,12 +39,12 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+		bool GetIsVoiceChatOn() { return IsVoiceChatOn; }
+
+	UFUNCTION()
+		void VoiceChatOnOff();
 private:
-
-	// for GetAllActorsOfClass
-	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<AActor> PlayerControllerClass;
-
 	// setting
 	UPROPERTY(EditAnywhere, category = "Setting")
 		float EyeForwardPosition = 0;
@@ -74,12 +74,14 @@ private:
 
 	//Voice
 	bool IsVoiceChatOn = false;
-	UFUNCTION()
-		void VoiceChatOnOff();
+
+	//Menu
+
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class UMenuWidget> MenuWidget;
+
+	UMenuWidget* InGameUI = nullptr;
 
 	UFUNCTION()
-		void StartSpeakGlobalVoiceChat();
-
-	UFUNCTION()
-		void StopSpeakGlobalVoiceChat();
+		void MenuOnOff();
 };

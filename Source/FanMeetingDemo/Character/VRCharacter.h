@@ -45,12 +45,16 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
+		bool GetIsVoiceChatOn() { return IsVoiceChatOn; }
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
+		void VoiceChatOnOff();
 private:
 	//Setting
 	UPROPERTY(VisibleAnywhere, category = "Setting")
@@ -81,10 +85,6 @@ private:
 	UPROPERTY(EditAnywhere, category = "Blinkers") //동적인 Blink를 위한 커브 
 		class UCurveFloat* RadiusVsVelocity;
 
-	// for GetAllActorsOfClass
-	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<AActor> PlayerControllerClass;
-
 	// Function
 	UFUNCTION()
 		void OnResetVR();
@@ -109,12 +109,4 @@ private:
 
 	//Voice
 	bool IsVoiceChatOn = false;
-	UFUNCTION()
-		void VoiceChatOnOff();
-
-	UFUNCTION()
-		void StartSpeakGlobalVoiceChat();
-
-	UFUNCTION()
-		void StopSpeakGlobalVoiceChat();
 };

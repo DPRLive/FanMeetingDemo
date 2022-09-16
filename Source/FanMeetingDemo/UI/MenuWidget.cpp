@@ -9,7 +9,8 @@ void UMenuWidget::Setup()
 
 	this->AddToViewport();
 	this->bIsFocusable = true;
-	FInputModeUIOnly InputMode;
+	//FInputModeUIOnly InputMode;
+	FInputModeGameAndUI InputMode;
 	InputMode.SetWidgetToFocus(this->TakeWidget());
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 

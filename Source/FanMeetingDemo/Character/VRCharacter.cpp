@@ -73,16 +73,6 @@ void AVRCharacter::NamePlateUpdate()
 	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
 	if (HasAuthority())
 	{
-		/*TArray<AActor*> ActorArray;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlayerControllerClass, ActorArray);
-		ActorArray.Sort([](const AActor& A, const AActor& B) {
-			return A.GetName() > B.GetName();
-			});
-		for (int32 i = 0; i < ActorArray.Num(); i++)
-		{
-			PlayerNameRef = Cast<APlayerController>(ActorArray[i])->PlayerState->GetPlayerName();
-			OnRep_PlayerNameRef();
-		}*/
 		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
 		OnRep_PlayerNameRef();
 	}
@@ -177,24 +167,13 @@ void AVRCharacter::VoiceChatOnOff()
 {
 	if (IsVoiceChatOn)
 	{
-		StopSpeakGlobalVoiceChat();
+		UUniversalVoiceChat::VoiceChatStopSpeak();
 		IsVoiceChatOn = false;
 	}
 	else
 	{
-		StartSpeakGlobalVoiceChat();
+		UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
 		IsVoiceChatOn = true;
 	}
 }
 
-void AVRCharacter::StartSpeakGlobalVoiceChat()
-{
-	// 일단 내 목소리 나도 들리게.
-	UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
-	UUniversalVoiceChat::VoiceChatSetMicrophoneVolume(10); //일단 볼륨 10. 나중에 UI로 변경 예정
-}
-
-void AVRCharacter::StopSpeakGlobalVoiceChat()
-{
-	UUniversalVoiceChat::VoiceChatStopSpeak();
-}

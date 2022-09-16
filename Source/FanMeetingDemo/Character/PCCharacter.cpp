@@ -3,6 +3,7 @@
 // custom header
 #include "../UI/NamePlate.h"
 #include "../FanMeetingPlayerState.h"
+#include "../UI/InGameUI.h"
 //plugin header
 #include "UniversalVoiceChatPro/Public/PlayerVoiceChatActor.h"
 // unreal header
@@ -36,6 +37,7 @@ void APCCharacter::BeginPlay()
 	Super::BeginPlay();
 	NamePlate->AddLocalOffset(FVector(0, 0, CharacterHeight / 2));
 	CameraSpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("EyePosSocket"));
+	UUniversalVoiceChat::VoiceChatSetMicrophoneVolume(5);
 
 	FTimerHandle WaitHandle;
 	// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
@@ -94,6 +96,7 @@ void APCCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APCCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &APCCharacter::StopJumping);
 	PlayerInputComponent->BindAction(TEXT("VoiceChatOnOff"), IE_Pressed, this, &APCCharacter::VoiceChatOnOff);
+	PlayerInputComponent->BindAction(TEXT("MenuOnOff"), IE_Pressed, this, &APCCharacter::MenuOnOff);
 }
 
 void APCCharacter::OnRep_PlayerNameRef()
@@ -134,24 +137,29 @@ void APCCharacter::VoiceChatOnOff()
 {
 	if (IsVoiceChatOn)
 	{
-		StopSpeakGlobalVoiceChat();
+		UUniversalVoiceChat::VoiceChatStopSpeak();
 		IsVoiceChatOn = false;
 	}
 	else
 	{
-		StartSpeakGlobalVoiceChat();
+		UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
 		IsVoiceChatOn = true;
 	}
 }
 
-void APCCharacter::StartSpeakGlobalVoiceChat()
+void APCCharacter::MenuOnOff()
 {
-	// 일단 내 목소리 나도 들리게.
-	UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
-	UUniversalVoiceChat::VoiceChatSetMicrophoneVolume(10); //일단 볼륨 10. 나중에 UI로 변경 예정
-}
-
-void APCCharacter::StopSpeakGlobalVoiceChat()
-{
-	UUniversalVoiceChat::VoiceChatStopSpeak();
+	if (InGameUI == nullptr)
+	{
+		if (MenuWidget == nullptr) return;
+		InGameUI = CreateWidget<UMenuWidget>(GetWorld(), MenuWidget);
+		InGameUI->SetOwner(this);
+		InGameUI->SetOwnerPlatformType(0);
+		if (InGameUI != nullptr && !InGameUI->IsSetup()) InGameUI->Setup();
+	}
+	else
+	{
+		if (InGameUI != nullptr && !InGameUI->IsSetup()) InGameUI->Setup();
+		else InGameUI->Teardown();
+	}
 }
