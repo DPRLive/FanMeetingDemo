@@ -45,18 +45,6 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	/*void CalculateHMDToCharLocation();
-
-	void HMDSyncLocation();
-
-	UFUNCTION(Server, Unreliable)
-		void Server_HMDSyncLocation(FVector NewLocation);*/
-
-	//UPROPERTY(ReplicatedUsing = OnRep_RepLocation)
-	//	FVector RepLocation;
-
-	//UFUNCTION()
-	//	void OnRep_RepLocation();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -118,4 +106,15 @@ private:
 
 	UFUNCTION()
 		void TurnLeftAction();
+
+	//Voice
+	bool IsVoiceChatOn = false;
+	UFUNCTION()
+		void VoiceChatOnOff();
+
+	UFUNCTION()
+		void StartSpeakGlobalVoiceChat();
+
+	UFUNCTION()
+		void StopSpeakGlobalVoiceChat();
 };

@@ -18,7 +18,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 		FString PlayerName ="UNKONWN_NAME";
 	UPROPERTY(BlueprintReadWrite)
-		uint8 PlatformType; // 0:PC, 1:VR
+		uint8 PlatformType = -1; // 0:PC, 1:VR
 
 public:
 	void SetPlayerName(const FString& S) { PlayerName = S; }

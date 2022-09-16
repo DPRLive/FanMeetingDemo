@@ -19,6 +19,10 @@ protected:
 
 	void NamePlateUpdate();
 
+	// Head bone 위 아래 회전을 위함
+	UPROPERTY(Replicated, BlueprintReadWrite)
+		FRotator ControllerRotate;
+
 	UPROPERTY(Replicated, BlueprintReadWrite)
 		FString PlayerName;
 
@@ -64,4 +68,18 @@ private:
 
 	UFUNCTION()
 		void MoveRight(float Scale);
+
+	UFUNCTION()
+		void LookUpMouse(float Scale);
+
+	//Voice
+	bool IsVoiceChatOn = false;
+	UFUNCTION()
+		void VoiceChatOnOff();
+
+	UFUNCTION()
+		void StartSpeakGlobalVoiceChat();
+
+	UFUNCTION()
+		void StopSpeakGlobalVoiceChat();
 };

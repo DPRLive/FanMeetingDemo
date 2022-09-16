@@ -31,4 +31,11 @@ private:
 
 	UFUNCTION(Server, Unreliable) // 0 = VR, 1 = PC
 		void Server_SwapCharacter(APawn* NowPawn, int Type);
+
+	UFUNCTION()
+		void Test_VRStart();
+
+	UFUNCTION()
+		void Test_PCStart();
+
 };
