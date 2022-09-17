@@ -8,35 +8,22 @@
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "ParentCharacter.h"
 #include "VRCharacter.generated.h"
 
 UCLASS()
-class FANMEETINGDEMO_API AVRCharacter : public ACharacter
+class FANMEETINGDEMO_API AVRCharacter : public AParentCharacter
 {
 	GENERATED_BODY()
 
 public:
 	AVRCharacter();
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 protected:
-	// NamePlates
-	void NamePlateUpdate();
-
-	UPROPERTY(Replicated, BlueprintReadWrite)
-		FString PlayerName;
-
-	UPROPERTY(ReplicatedUsing = OnRep_PlayerNameRef, BlueprintReadWrite)
-		FString PlayerNameRef;
-
-	UFUNCTION()
-		void OnRep_PlayerNameRef();
-
 	// Components (BlueprintReadWrite)
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		class UCameraComponent* Camera;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class UMotionControllerComponent* ControllerLeft;
 
@@ -45,16 +32,7 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-		bool GetIsVoiceChatOn() { return IsVoiceChatOn; }
 
-public:	
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION()
-		void VoiceChatOnOff();
 private:
 	//Setting
 	UPROPERTY(VisibleAnywhere, category = "Setting")
@@ -70,12 +48,6 @@ private:
 	UPROPERTY() // Blinker를 위한 포스트프로세스 컴포넌트
 		class UPostProcessComponent* PostProcessComponent;
 
-	UPROPERTY(EditAnywhere)
-		class UWidgetComponent* NamePlate;
-
-	// Property
-	//FVector HMDToCharLocation = FVector::ZeroVector;
-
 	UPROPERTY()
 		class UMaterialInstanceDynamic* BlinkerMaterialInstance;
 
@@ -85,7 +57,7 @@ private:
 	UPROPERTY(EditAnywhere, category = "Blinkers") //동적인 Blink를 위한 커브 
 		class UCurveFloat* RadiusVsVelocity;
 
-	// Function
+	// VRFunction
 	UFUNCTION()
 		void OnResetVR();
 
@@ -95,11 +67,9 @@ private:
 	void UpdateBlinkers();
 
 	//Movement
-	UFUNCTION()
-		void MoveForward(float Scale);
+	virtual void MoveForward(float Scale) override;
 	
-	UFUNCTION()
-		void MoveRight(float Scale);
+	virtual void MoveRight(float Scale) override;
 
 	UFUNCTION()
 		void TurnRightAction();
@@ -107,6 +77,6 @@ private:
 	UFUNCTION()
 		void TurnLeftAction();
 
-	//Voice
-	bool IsVoiceChatOn = false;
+	//Menu
+	virtual void MenuOnOff() override;
 };

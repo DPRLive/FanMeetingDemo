@@ -1,10 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "VRCharacter.h"
 //custom header
-#include "../UI/NamePlate.h"
-#include "../FanMeetingPlayerState.h"
 //plugin header
-#include "UniversalVoiceChatPro/Public/PlayerVoiceChatActor.h"
 //unreal header
 #include "Net/UnrealNetwork.h"
 #include "Components/WidgetComponent.h"
@@ -58,41 +55,6 @@ void AVRCharacter::BeginPlay()
 	// Super::BeginPlay를 나중에 호출해야 cpp코드가 블루프린트보다 먼저 호출됨.
 	Super::BeginPlay();
 	OnResetVR();
-
-	FTimerHandle WaitHandle;
-	// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
-	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
-		{
-			NamePlateUpdate();
-		}), 0.1, false);
-}
-
-void AVRCharacter::NamePlateUpdate()
-{
-	if (IsLocallyControlled()) NamePlate->SetVisibility(false);
-	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
-	if (HasAuthority())
-	{
-		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
-		OnRep_PlayerNameRef();
-	}
-	else
-	{
-		Cast<UNamePlate>(NamePlate->GetWidget())->SetVRCharacterRef(this);
-	}
-}
-
-void AVRCharacter::OnRep_PlayerNameRef()
-{
-	PlayerName = PlayerNameRef;
-}
-
-void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AVRCharacter, PlayerName);
-	DOREPLIFETIME(AVRCharacter, PlayerNameRef);
 }
 
 void AVRCharacter::Tick(float DeltaTime)
@@ -163,17 +125,7 @@ void AVRCharacter::TurnLeftAction()
 	GetController()->SetControlRotation(FRotator(0, NewYaw, 0));
 }
 
-void AVRCharacter::VoiceChatOnOff()
+void AVRCharacter::MenuOnOff()
 {
-	if (IsVoiceChatOn)
-	{
-		UUniversalVoiceChat::VoiceChatStopSpeak();
-		IsVoiceChatOn = false;
-	}
-	else
-	{
-		UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
-		IsVoiceChatOn = true;
-	}
 }
 

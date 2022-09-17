@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "GameFramework/Character.h"
+#include "../Character/ParentCharacter.h"
 #include "MenuWidget.generated.h"
 
 /**
@@ -22,18 +22,18 @@ public:
 
 	bool IsSetup() { return bSetup; }
 
-	void SetOwner(ACharacter* NewOwner) { Owner = NewOwner; }
+	void SetOwner(AParentCharacter* NewOwner) { Owner = NewOwner; }
 
 	void SetOwnerPlatformType(int32 NewPlayformType) { PlatformType = NewPlayformType; }
 
-	ACharacter* GetOwner() { return Owner; }
+	AParentCharacter* GetOwner() { return Owner; }
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
 		int32 PlatformType = -1;
 
 	UPROPERTY(BlueprintReadOnly)
-		ACharacter* Owner;
+		AParentCharacter* Owner;
 
 private:
 	bool bSetup = false;

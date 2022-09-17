@@ -1,19 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "PCCharacter.h"
 // custom header
-#include "../UI/NamePlate.h"
-#include "../FanMeetingPlayerState.h"
 #include "../UI/InGameUI.h"
 //plugin header
-#include "UniversalVoiceChatPro/Public/PlayerVoiceChatActor.h"
 // unreal header
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-
-
 
 APCCharacter::APCCharacter()
 {
@@ -37,37 +32,13 @@ void APCCharacter::BeginPlay()
 	Super::BeginPlay();
 	NamePlate->AddLocalOffset(FVector(0, 0, CharacterHeight / 2));
 	CameraSpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("EyePosSocket"));
-	UUniversalVoiceChat::VoiceChatSetMicrophoneVolume(5);
-
-	FTimerHandle WaitHandle;
-	// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
-	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
-		{
-			NamePlateUpdate();
-		}), 0.1, false);
-}
-
-void APCCharacter::NamePlateUpdate()
-{
-	if (IsLocallyControlled()) NamePlate->SetVisibility(false);
-	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
-	if (HasAuthority())
-	{
-		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
-		OnRep_PlayerNameRef();
-	}
-	else
-	{
-		Cast<UNamePlate>(NamePlate->GetWidget())->SetPCCharacterRef(this);
-	}
+	
 }
 
 void APCCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(APCCharacter, ControllerRotate);
-	DOREPLIFETIME(APCCharacter, PlayerName);
-	DOREPLIFETIME(APCCharacter, PlayerNameRef);
 }
 
 void APCCharacter::Tick(float DeltaTime)
@@ -99,11 +70,6 @@ void APCCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(TEXT("MenuOnOff"), IE_Pressed, this, &APCCharacter::MenuOnOff);
 }
 
-void APCCharacter::OnRep_PlayerNameRef()
-{
-	PlayerName = PlayerNameRef;
-}
-
 void APCCharacter::MoveForward(float Scale)
 {
 	AddMovementInput(GetActorForwardVector(), Scale);
@@ -121,30 +87,11 @@ void APCCharacter::LookUpMouse(float Scale)
 	if (MyController != nullptr)
 	{
 		float NowPitch = MyController->GetControlRotation().Pitch;
-		if (NowPitch > 180 && NowPitch < 320 && Scale > 0)
-		{
-			return;
-		}
-		if (NowPitch < 180 && NowPitch > 90 && Scale < 0)
-		{
-			return;
-		}
+		if ((NowPitch > 180 && NowPitch < 320 && Scale > 0) ||
+			(NowPitch < 180 && NowPitch > 90 && Scale < 0))
+				return;
 	}
 	AddControllerPitchInput(Scale);
-}
-
-void APCCharacter::VoiceChatOnOff()
-{
-	if (IsVoiceChatOn)
-	{
-		UUniversalVoiceChat::VoiceChatStopSpeak();
-		IsVoiceChatOn = false;
-	}
-	else
-	{
-		UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
-		IsVoiceChatOn = true;
-	}
 }
 
 void APCCharacter::MenuOnOff()

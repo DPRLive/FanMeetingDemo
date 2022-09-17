@@ -5,8 +5,7 @@
 //plug in
 #include "UniversalVoiceChatPro/Public/PlayerVoiceChatActor.h"
 //custom
-#include "../Character/PCCharacter.h"
-#include "../Character/VRCharacter.h"
+#include "../Character/ParentCharacter.h"
 //ue header
 #include "Kismet/GameplayStatics.h"
 
@@ -29,12 +28,7 @@ void UInGameUI::Close()
 
 void UInGameUI::MicOnOff()
 {
-	if (PlatformType == 0)
-	{
-		Cast<APCCharacter>(Owner)->VoiceChatOnOff();
-	}
-	else
-		Cast<AVRCharacter>(Owner)->VoiceChatOnOff();
+	Owner->VoiceChatOnOff();
 }
 
 void UInGameUI::SetMicVolume(float Value)
