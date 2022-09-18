@@ -4,7 +4,6 @@
 
 #include "UniversalVoiceChatPro/Public/PlayerVoiceChatActor.h"
 
-#include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "ParentCharacter.h"
 

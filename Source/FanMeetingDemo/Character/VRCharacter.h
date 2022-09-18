@@ -22,6 +22,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(BlueprintCallable)
+		void OnResetVR();
+
+	//Blinkers
+	UFUNCTION()
+		void SetBlink();
+
+	UFUNCTION(BlueprintCallable)
+		bool GetUseBlinker() { return UseBlinker; }
+
 protected:
 	// Components (BlueprintReadWrite)
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -32,12 +43,12 @@ protected:
 
 	virtual void BeginPlay() override;
 
-
 private:
 	//Setting
 	UPROPERTY(VisibleAnywhere, category = "Setting")
 		float BaseTurnRate = 45.f;
 
+	// Blinkers
 	UPROPERTY(EditAnywhere, category = "Blinkers")
 		bool UseBlinker = false;
 
@@ -58,11 +69,6 @@ private:
 		class UCurveFloat* RadiusVsVelocity;
 
 	// VRFunction
-	UFUNCTION()
-		void OnResetVR();
-
-	UFUNCTION()
-		void SetBlink();
 
 	void UpdateBlinkers();
 
@@ -79,4 +85,19 @@ private:
 
 	//Menu
 	virtual void MenuOnOff() override;
+
+	UPROPERTY(EditAnywhere)
+		class UWidgetComponent* MenuComponent;
+
+	UPROPERTY(VisibleAnywhere)
+		class UWidgetInteractionComponent* RightPointer;
+
+	UPROPERTY(VisibleAnywhere)
+		class USplineMeshComponent* RightPointerMesh;
+
+	UFUNCTION()
+		void TriggerRightPressed();
+
+	UFUNCTION()
+		void TriggerRightReleased();
 };

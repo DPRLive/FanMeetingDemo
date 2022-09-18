@@ -16,6 +16,8 @@ class FANMEETINGDEMO_API UInGameUI : public UMenuWidget
 public:
 	virtual bool Initialize() override;
 
+	UFUNCTION(BlueprintCallable)
+		bool GetShowPlayerName() { return ShowPlayerName; }
 protected:
 	UFUNCTION(BlueprintCallable)
 		void GoMainMenu();
@@ -29,4 +31,21 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 		void SetMicVolume(float Value);
+
+	// VR Setting
+	UFUNCTION(BlueprintCallable)
+		void BlinkerOnOff();
+
+	UFUNCTION(BlueprintCallable)
+		void ResetVR();
+
+	// Game Setting
+	UFUNCTION(BlueprintCallable)
+		void TogglePlayerName();
+
+private:
+	bool ShowPlayerName = true;
+
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class AParentCharacter> CharacterClass;
 };

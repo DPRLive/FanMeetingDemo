@@ -1,8 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "VRCharacter.h"
 //custom header
+#include "../UI/InGameUI.h"
 //plugin header
 //unreal header
+#include "Components/SplineMeshComponent.h"
+#include "Components/WidgetInteractionComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Components/WidgetComponent.h"
 #include "MotionControllerComponent.h"
@@ -26,8 +29,18 @@ AVRCharacter::AVRCharacter()
 	ControllerLeft = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("ControllerLeft"));
 	ControllerLeft->SetupAttachment(VRRoot);
 
+	MenuComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("MenuComponent"));
+	MenuComponent->SetupAttachment(ControllerLeft);
+	MenuComponent->SetDrawSize(FVector2D(800, 800));
+
 	ControllerRight = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("ControllerRight"));
 	ControllerRight->SetupAttachment(VRRoot);
+
+	RightPointer = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("RightPointer"));
+	RightPointer->SetupAttachment(ControllerRight);
+
+	RightPointerMesh = CreateDefaultSubobject<USplineMeshComponent>(TEXT("RightPointerMesh"));
+	RightPointerMesh->SetupAttachment(RightPointer);
 
 	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
 	PostProcessComponent->bUnbound = false;
@@ -86,9 +99,11 @@ void AVRCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AVRCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AVRCharacter::StopJumping);
 	PlayerInputComponent->BindAction(TEXT("OnResetVR"), IE_Pressed, this, &AVRCharacter::OnResetVR);
-	PlayerInputComponent->BindAction(TEXT("SetBlink"), IE_Pressed, this, &AVRCharacter::SetBlink);
-	PlayerInputComponent->BindAction(TEXT("VoiceChatOnOff"), IE_Pressed, this, &AVRCharacter::VoiceChatOnOff);
-
+	//PlayerInputComponent->BindAction(TEXT("SetBlink"), IE_Pressed, this, &AVRCharacter::SetBlink);
+	//PlayerInputComponent->BindAction(TEXT("VoiceChatOnOff"), IE_Pressed, this, &AVRCharacter::VoiceChatOnOff);
+	PlayerInputComponent->BindAction(TEXT("MenuOnOff"), IE_Pressed, this, &AVRCharacter::MenuOnOff);
+	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Pressed, this, &AVRCharacter::TriggerRightPressed);
+	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Released, this, &AVRCharacter::TriggerRightReleased);
 }
 
 void AVRCharacter::OnResetVR()
@@ -127,5 +142,45 @@ void AVRCharacter::TurnLeftAction()
 
 void AVRCharacter::MenuOnOff()
 {
+	if (InGameUI == nullptr)
+	{
+		if (MenuWidget == nullptr) return;
+		InGameUI = CreateWidget<UMenuWidget>(GetWorld(), MenuWidget);
+		InGameUI->SetOwner(this);
+		InGameUI->SetOwnerPlatformType(1);
+		if (InGameUI != nullptr && MenuComponent->GetWidget() == nullptr)
+		{
+			RightPointerMesh->SetVisibility(true);
+			ControllerLeft->SetShowDeviceModel(true);
+			ControllerRight->SetShowDeviceModel(true);
+			MenuComponent->SetWidget(InGameUI);
+		}
+	}
+	else
+	{
+		if (InGameUI != nullptr && MenuComponent->GetWidget() == nullptr)
+		{
+			RightPointerMesh->SetVisibility(true);
+			ControllerLeft->SetShowDeviceModel(true);
+			ControllerRight->SetShowDeviceModel(true);
+			MenuComponent->SetWidget(InGameUI);
+		}
+		else
+		{
+			RightPointerMesh->SetVisibility(false);
+			ControllerLeft->SetShowDeviceModel(false);
+			ControllerRight->SetShowDeviceModel(false);
+			MenuComponent->SetWidget(nullptr);
+		}
+	}
 }
 
+void AVRCharacter::TriggerRightPressed()
+{
+	RightPointer->PressPointerKey(EKeys::LeftMouseButton);
+}
+
+void AVRCharacter::TriggerRightReleased()
+{
+	RightPointer->ReleasePointerKey(EKeys::LeftMouseButton);
+}

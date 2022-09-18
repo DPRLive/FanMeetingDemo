@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "ParentCharacter.generated.h"
 
@@ -26,6 +27,7 @@ public:
 	UFUNCTION()
 		void VoiceChatOnOff();
 
+	UWidgetComponent* GetNamePlate() { return NamePlate; }
 protected:
 	virtual void BeginPlay() override;
 
@@ -35,7 +37,7 @@ protected:
 
 	//NamePlate
 	UPROPERTY(EditAnywhere)
-		class UWidgetComponent* NamePlate;
+		UWidgetComponent* NamePlate;
 
 	void NamePlateUpdate();
 
