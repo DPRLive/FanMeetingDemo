@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "ParentCharacter.h"
 #include "../UI/NamePlate.h"
 
 #include "UniversalVoiceChatPro/Public/PlayerVoiceChatActor.h"
 
 #include "Net/UnrealNetwork.h"
-#include "ParentCharacter.h"
 
 AParentCharacter::AParentCharacter()
 {
