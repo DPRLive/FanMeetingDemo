@@ -4,6 +4,7 @@
 #include "../UI/InGameUI.h"
 //plugin header
 // unreal header
+#include "Camera/PlayerCameraManager.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
@@ -13,7 +14,6 @@
 APCCharacter::APCCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArm"));
 	CameraSpringArm->bUsePawnControlRotation = true;
 	CameraSpringArm->TargetArmLength = 0;
@@ -33,6 +33,15 @@ void APCCharacter::BeginPlay()
 	NamePlate->AddLocalOffset(FVector(0, 0, CharacterHeight / 2));
 	CameraSpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("EyePosSocket"));
 	
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		APlayerCameraManager* PlayerCameraManager = Cast<APlayerController>(GetController())->PlayerCameraManager;
+		if (PlayerCameraManager != nullptr)
+		{
+			PlayerCameraManager->ViewPitchMax = 90.0f;
+			PlayerCameraManager->ViewPitchMin = -40.0f;
+		}
+	}
 }
 
 void APCCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -82,15 +91,6 @@ void APCCharacter::MoveRight(float Scale)
 
 void APCCharacter::LookUpMouse(float Scale)
 {
-	// Head Bone의 상하 각도 제한 
-	AController* MyController = GetController();
-	if (MyController != nullptr)
-	{
-		float NowPitch = MyController->GetControlRotation().Pitch;
-		if ((NowPitch > 180 && NowPitch < 320 && Scale > 0) ||
-			(NowPitch < 180 && NowPitch > 90 && Scale < 0))
-				return;
-	}
 	AddControllerPitchInput(Scale);
 }
 
@@ -108,5 +108,35 @@ void APCCharacter::MenuOnOff()
 	{
 		if (InGameUI != nullptr && !InGameUI->IsSetup()) InGameUI->Setup();
 		else InGameUI->Teardown();
+	}
+}
+
+void APCCharacter::LockPlayerCameraYaw()
+{
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		APlayerCameraManager* PlayerCameraManager = Cast<APlayerController>(GetController())->PlayerCameraManager;
+		if (PlayerCameraManager != nullptr)
+		{
+			PlayerCameraManager->ViewPitchMax = 20.0f;
+			PlayerCameraManager->ViewPitchMin = -25.0f;
+			PlayerCameraManager->ViewYawMax = 266.0f;
+			PlayerCameraManager->ViewYawMin = 95.0f;
+		}
+	}
+}
+
+void APCCharacter::UnLockPlayerCameraYaw()
+{
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		APlayerCameraManager* PlayerCameraManager = Cast<APlayerController>(GetController())->PlayerCameraManager;
+		if (PlayerCameraManager != nullptr)
+		{
+			PlayerCameraManager->ViewPitchMax = 90.0f;
+			PlayerCameraManager->ViewPitchMin = -40.0f;
+			PlayerCameraManager->ViewYawMax = 359.9f;
+			PlayerCameraManager->ViewYawMin = 0.0f;
+		}
 	}
 }

@@ -21,6 +21,11 @@ protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
 		FRotator ControllerRotate;
 
+	UFUNCTION(BlueprintCallable)
+		void LockPlayerCameraYaw();
+
+	UFUNCTION(BlueprintCallable)
+		void UnLockPlayerCameraYaw();
 public:	
 	virtual void Tick(float DeltaTime) override;
 
