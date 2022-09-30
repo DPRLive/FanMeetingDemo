@@ -76,6 +76,12 @@ void AVRCharacter::Tick(float DeltaTime)
 	if (UseBlinker) UpdateBlinkers();
 }
 
+void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AVRCharacter, SittingRotate);
+}
+
 void AVRCharacter::UpdateBlinkers()
 {
 	if (RadiusVsVelocity == nullptr) return;
@@ -115,6 +121,14 @@ void AVRCharacter::SetBlink()
 {
 	if (UseBlinker) UseBlinker = false;
 	else UseBlinker = true;
+}
+
+void AVRCharacter::Server_SetSittingRotate_Implementation(FRotator NewRotator)
+{
+	if (HasAuthority())
+	{
+		SittingRotate = NewRotator;
+	}
 }
 
 void AVRCharacter::MoveForward(float Scale)

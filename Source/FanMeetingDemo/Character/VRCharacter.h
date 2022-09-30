@@ -23,6 +23,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	UFUNCTION(BlueprintCallable)
 		void OnResetVR();
 
@@ -33,6 +35,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool GetUseBlinker() { return UseBlinker; }
 
+	UFUNCTION(Server, Unreliable ,BlueprintCallable)
+		void Server_SetSittingRotate(FRotator NewRotator);
 protected:
 	// Components (BlueprintReadWrite)
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -43,6 +47,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	UPROPERTY(Replicated, BlueprintReadWrite)
+		FRotator SittingRotate;
 private:
 	//Setting
 	UPROPERTY(VisibleAnywhere, category = "Setting")
