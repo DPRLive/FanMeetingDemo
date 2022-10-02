@@ -43,6 +43,7 @@ void AParentCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AParentCharacter, PlayerName);
 	DOREPLIFETIME(AParentCharacter, PlayerNameRef);
+	DOREPLIFETIME(AParentCharacter, ChangeMesh);
 }
 
 void AParentCharacter::NamePlateUpdate()
@@ -52,7 +53,7 @@ void AParentCharacter::NamePlateUpdate()
 	if (HasAuthority())
 	{
 		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
-		OnRep_PlayerNameRef();
+		//OnRep_PlayerNameRef();
 	}
 	else
 	{
@@ -63,6 +64,11 @@ void AParentCharacter::NamePlateUpdate()
 void AParentCharacter::OnRep_PlayerNameRef()
 {
 	PlayerName = PlayerNameRef;
+}
+
+void AParentCharacter::OnRep_ChangeMesh()
+{
+	if(ChangeMesh != nullptr) GetMesh()->SetSkeletalMesh(ChangeMesh);
 }
 
 void AParentCharacter::VoiceChatOnOff()
@@ -77,4 +83,9 @@ void AParentCharacter::VoiceChatOnOff()
 		UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
 		IsVoiceChatOn = true;
 	}
+}
+
+void AParentCharacter::SetChangeMesh(USkeletalMesh* NewSkeletalMesh)
+{
+	ChangeMesh = NewSkeletalMesh;
 }

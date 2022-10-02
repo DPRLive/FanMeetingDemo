@@ -27,6 +27,8 @@ public:
 	UFUNCTION()
 		void VoiceChatOnOff();
 
+	void SetChangeMesh(USkeletalMesh* NewSkeletalMesh);
+
 	UWidgetComponent* GetNamePlate() { return NamePlate; }
 protected:
 	virtual void BeginPlay() override;
@@ -68,4 +70,10 @@ protected:
 
 	UFUNCTION()
 		virtual void MoveRight(float Scale) {};
+
+	UPROPERTY(ReplicatedUsing = OnRep_ChangeMesh)
+		USkeletalMesh* ChangeMesh;
+
+	UFUNCTION()
+		void OnRep_ChangeMesh();
 };
