@@ -16,4 +16,12 @@ class FANMEETINGDEMO_API AFanMeetingDemoGameModeBase : public AGameModeBase
 
 public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+protected:
+	UFUNCTION(BlueprintCallable)
+		void ForcedMuteAllOnOff();
+	
+
+	UPROPERTY(BlueprintReadWrite)
+		bool ForcedMute = false;
 };

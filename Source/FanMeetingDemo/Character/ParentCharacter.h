@@ -21,11 +21,18 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// Voice
 	UFUNCTION(BlueprintCallable)
 		bool GetIsVoiceChatOn() { return IsVoiceChatOn; }
 
+	UPROPERTY(ReplicatedUsing = OnRep_ForcedMuteOnOff, BlueprintReadWrite)
+		bool ForcedMute = false;
+
 	UFUNCTION()
 		void VoiceChatOnOff();
+
+	UFUNCTION()
+		void OnRep_ForcedMuteOnOff();
 
 	void SetChangeMesh(USkeletalMesh* NewSkeletalMesh);
 

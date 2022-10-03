@@ -44,6 +44,7 @@ void AParentCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AParentCharacter, PlayerName);
 	DOREPLIFETIME(AParentCharacter, PlayerNameRef);
 	DOREPLIFETIME(AParentCharacter, ChangeMesh);
+	DOREPLIFETIME(AParentCharacter, ForcedMute);
 }
 
 void AParentCharacter::NamePlateUpdate()
@@ -73,6 +74,8 @@ void AParentCharacter::OnRep_ChangeMesh()
 
 void AParentCharacter::VoiceChatOnOff()
 {
+	if (ForcedMute) return;
+
 	if (IsVoiceChatOn)
 	{
 		UUniversalVoiceChat::VoiceChatStopSpeak();
@@ -82,6 +85,16 @@ void AParentCharacter::VoiceChatOnOff()
 	{
 		UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
 		IsVoiceChatOn = true;
+	}
+}
+
+
+void AParentCharacter::OnRep_ForcedMuteOnOff()
+{
+	if (ForcedMute)
+	{
+		IsVoiceChatOn = false;
+		UUniversalVoiceChat::VoiceChatStopSpeak();
 	}
 }
 

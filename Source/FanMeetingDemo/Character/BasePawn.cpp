@@ -63,7 +63,7 @@ void ABasePawn::Test_VRStart()
 
 void ABasePawn::Test_PCStart()
 {
-	Server_SwapCharacter(this, 0, "VTUBER");
+	Server_SwapCharacter(this, 0, "MANAGER");
 }
 
 void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int PlatformType, const FString& JoinType)

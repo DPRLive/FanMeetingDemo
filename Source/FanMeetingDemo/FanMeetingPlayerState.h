@@ -18,6 +18,9 @@ public:
 
 	UFUNCTION(Server, unreliable)
 		void Server_SetJoinType(const FString& S);
+
+	UFUNCTION(BlueprintCallable)
+		FString& GetJoinType() { return JoinType; }
 protected:
 	UPROPERTY(Replicated)
 		FString JoinType;
