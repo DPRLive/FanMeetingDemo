@@ -63,7 +63,7 @@ void ABasePawn::Test_VRStart()
 
 void ABasePawn::Test_PCStart()
 {
-	Server_SwapCharacter(this, 0, "FAN");
+	Server_SwapCharacter(this, 0, "MANAGER");
 }
 
 void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int PlatformType, const FString& JoinType)
@@ -113,4 +113,5 @@ void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int Platform
 	MyController->UnPossess();
 	MyController->Possess(Character);
 	NowPawn->Destroy();
+
 }

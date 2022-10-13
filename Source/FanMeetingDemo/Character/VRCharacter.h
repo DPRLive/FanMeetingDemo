@@ -37,6 +37,7 @@ public:
 
 	UFUNCTION(Server, Unreliable ,BlueprintCallable)
 		void Server_SetSittingRotate(FRotator NewRotator);
+
 protected:
 	// Components (BlueprintReadWrite)
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -49,6 +50,7 @@ protected:
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
 		FRotator SittingRotate;
+
 private:
 	//Setting
 	UPROPERTY(VisibleAnywhere, category = "Setting")

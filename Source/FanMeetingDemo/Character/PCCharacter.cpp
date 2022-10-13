@@ -116,12 +116,13 @@ void APCCharacter::LockPlayerCameraYaw()
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		APlayerCameraManager* PlayerCameraManager = Cast<APlayerController>(GetController())->PlayerCameraManager;
+		float NowYaw = GetActorRotation().Yaw;
 		if (PlayerCameraManager != nullptr)
 		{
 			PlayerCameraManager->ViewPitchMax = 20.0f;
 			PlayerCameraManager->ViewPitchMin = -25.0f;
-			PlayerCameraManager->ViewYawMax = 266.0f;
-			PlayerCameraManager->ViewYawMin = 95.0f;
+			PlayerCameraManager->ViewYawMax = NowYaw + 85.0f; //266.0f; //86
+			PlayerCameraManager->ViewYawMin = NowYaw - 85.0f; //-95.0f; //85
 		}
 	}
 }
