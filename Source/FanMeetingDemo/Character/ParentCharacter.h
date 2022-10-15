@@ -68,7 +68,7 @@ protected:
 
 	UMenuWidget* InGameUI = nullptr;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		virtual void MenuOnOff() {};
 
 	//Movement

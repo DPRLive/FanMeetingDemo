@@ -58,7 +58,7 @@ void ABasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABasePawn::Test_VRStart()
 {
-	Server_SwapCharacter(this, 1, TEXT("MANAGER"));
+	Server_SwapCharacter(this, 1, TEXT("VTUBER"));
 }
 
 void ABasePawn::Test_PCStart()
@@ -97,14 +97,14 @@ void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int Platform
 			Character = Cast<ACharacter>(GetWorld()->SpawnActor(N_VRCharacterClass, &SpawnLocation));
 		else if (JoinType.Compare("VTUBER") == 0)
 		{
-			Character = Cast<ACharacter>(GetWorld()->SpawnActor(N_VRCharacterClass, &SpawnLocation));
+			Character = Cast<ACharacter>(GetWorld()->SpawnActor(VT_VRCharacterClass, &SpawnLocation));
 
-			USkeletalMesh* MySkeletalMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/VTuberCharacter/VTuberCharacter.VTuberCharacter'"), NULL, LOAD_None, NULL);
-			if (MySkeletalMesh != nullptr)
-			{
-				// SetChangeMesh를 통해 server -> client로 SkeletalMesh Replicated
-				Cast<AParentCharacter>(Character)->SetChangeMesh(MySkeletalMesh);
-			}
+			//USkeletalMesh* MySkeletalMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/VTuberCharacter/VTuberCharacter.VTuberCharacter'"), NULL, LOAD_None, NULL);
+			//if (MySkeletalMesh != nullptr)
+			//{
+			//	// SetChangeMesh를 통해 server -> client로 SkeletalMesh Replicated
+			//	Cast<AParentCharacter>(Character)->SetChangeMesh(MySkeletalMesh);
+			//}
 		}
 		else if (JoinType.Compare("FAN") == 0)
 			Character = Cast<ACharacter>(GetWorld()->SpawnActor(MH_VRCharacterClass, &SpawnLocation));

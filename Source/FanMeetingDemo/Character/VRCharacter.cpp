@@ -79,7 +79,7 @@ void AVRCharacter::Tick(float DeltaTime)
 void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AVRCharacter, SittingRotate);
+	DOREPLIFETIME(AVRCharacter, IsSitting);
 }
 
 void AVRCharacter::UpdateBlinkers()
@@ -123,11 +123,12 @@ void AVRCharacter::SetBlink()
 	else UseBlinker = true;
 }
 
-void AVRCharacter::Server_SetSittingRotate_Implementation(FRotator NewRotator)
+void AVRCharacter::Server_ToggleIsSitting_Implementation()
 {
 	if (HasAuthority())
 	{
-		SittingRotate = NewRotator;
+		if (IsSitting) IsSitting = false;
+		else IsSitting = true;
 	}
 }
 

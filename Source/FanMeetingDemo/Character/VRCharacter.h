@@ -36,7 +36,7 @@ public:
 		bool GetUseBlinker() { return UseBlinker; }
 
 	UFUNCTION(Server, Unreliable ,BlueprintCallable)
-		void Server_SetSittingRotate(FRotator NewRotator);
+		void Server_ToggleIsSitting();
 
 protected:
 	// Components (BlueprintReadWrite)
@@ -48,8 +48,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY(Replicated, BlueprintReadWrite)
-		FRotator SittingRotate;
+	UPROPERTY(Replicated, BlueprintReadOnly)
+		bool IsSitting;
 
 private:
 	//Setting
@@ -92,7 +92,7 @@ private:
 		void TurnLeftAction();
 
 	//Menu
-	virtual void MenuOnOff() override;
+		virtual void MenuOnOff() override;
 
 	UPROPERTY(EditAnywhere)
 		class UWidgetComponent* MenuComponent;
