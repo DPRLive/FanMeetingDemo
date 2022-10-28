@@ -38,7 +38,7 @@ void ABasePawn::BeginPlay()
 				{
 					FMPlayerState->Server_SetJoinType(JoinType);
 				}
-				//Server_SwapCharacter(this, PlatformType, JoinType);
+				Server_SwapCharacter(this, PlatformType, JoinType);
 			}), 0.1, false);
 	}
 }

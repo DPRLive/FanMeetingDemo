@@ -14,7 +14,11 @@ void UMenuWidget::Setup()
 	InputMode.SetWidgetToFocus(this->TakeWidget());
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	APlayerController* PlayerController;
+
+	if (Owner == nullptr) PlayerController = GetWorld()->GetFirstPlayerController();
+	else PlayerController = Cast<APlayerController>(Owner->GetController());
+
 	if (!ensure(PlayerController != nullptr)) return;
 	PlayerController->SetInputMode(InputMode);
 	PlayerController->bShowMouseCursor = true;
@@ -25,7 +29,11 @@ void UMenuWidget::Teardown()
 	bSetup = false;
 
 	FInputModeGameOnly InputMode;
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+
+	APlayerController* PlayerController;
+	if (Owner == nullptr) PlayerController = GetWorld()->GetFirstPlayerController();
+	else PlayerController = Cast<APlayerController>(Owner->GetController());
+
 	if (!ensure(PlayerController != nullptr)) return;
 	PlayerController->SetInputMode(InputMode);
 	PlayerController->bShowMouseCursor = false;
