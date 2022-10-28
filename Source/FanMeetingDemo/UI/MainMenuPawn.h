@@ -45,7 +45,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 		UWidgetInteractionComponent* LeftPointer;
 
-	TSubclassOf<UMainMenuUI> MainMenu;
+	UPROPERTY()
+		TSubclassOf<UMainMenuUI> MainMenu;
 
 	UFUNCTION()
 		void TriggerRightPressed();

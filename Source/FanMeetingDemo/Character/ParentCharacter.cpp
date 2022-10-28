@@ -54,7 +54,6 @@ void AParentCharacter::NamePlateUpdate()
 	if (HasAuthority())
 	{
 		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
-		//OnRep_PlayerNameRef();
 	}
 	else
 	{
@@ -84,7 +83,7 @@ void AParentCharacter::VoiceChatOnOff()
 	else
 	{
 		// 거리 2500이면 적당할듯
-		UUniversalVoiceChat::VoiceChatStartSpeak(true, true, 0, true, 1000);
+		UUniversalVoiceChat::VoiceChatStartSpeak(false, true, 0, true, 3000);
 		IsVoiceChatOn = true;
 	}
 }

@@ -81,7 +81,6 @@ private:
 		class UCurveFloat* RadiusVsVelocity;
 
 	// VRFunction
-
 	void UpdateBlinkers();
 
 	//Movement
@@ -94,8 +93,6 @@ private:
 
 	UFUNCTION()
 		void TurnLeftAction();
-
-
 
 	UPROPERTY(EditAnywhere)
 		class UWidgetComponent* MenuComponent;

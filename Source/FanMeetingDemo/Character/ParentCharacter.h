@@ -66,7 +66,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class UMenuWidget> MenuWidget;
 
-	UMenuWidget* InGameUI = nullptr;
+	UPROPERTY() // UPROPERTY() Ãß°¡
+		UMenuWidget* InGameUI = nullptr;
 
 	//Movement
 	UFUNCTION()

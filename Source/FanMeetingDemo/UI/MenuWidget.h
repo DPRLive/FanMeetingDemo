@@ -16,6 +16,8 @@ class FANMEETINGDEMO_API UMenuWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	virtual bool Initialize() override;
+
 	void Setup();
 
 	void Teardown();
