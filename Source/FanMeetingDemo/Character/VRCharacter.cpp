@@ -163,7 +163,7 @@ void AVRCharacter::MenuOnOff()
 		InGameUI = CreateWidget<UMenuWidget>(GetWorld(), MenuWidget);
 		InGameUI->SetOwner(this);
 		InGameUI->SetOwnerPlatformType(1);
-		if (InGameUI != nullptr && MenuComponent->GetWidget() == nullptr)
+		if (InGameUI != nullptr && MenuComponent != nullptr && MenuComponent->GetWidget() == nullptr)
 		{
 			RightPointerMesh->SetVisibility(true);
 			ControllerLeft->SetShowDeviceModel(true);
@@ -182,6 +182,7 @@ void AVRCharacter::MenuOnOff()
 		}
 		else
 		{
+			if (MenuComponent == nullptr) return;
 			RightPointerMesh->SetVisibility(false);
 			ControllerLeft->SetShowDeviceModel(false);
 			ControllerRight->SetShowDeviceModel(false);

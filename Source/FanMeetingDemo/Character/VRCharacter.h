@@ -51,6 +51,10 @@ protected:
 	UPROPERTY(Replicated, BlueprintReadOnly)
 		bool IsSitting;
 
+	//Menu
+	UFUNCTION(BlueprintCallable)
+		void MenuOnOff();
+
 private:
 	//Setting
 	UPROPERTY(VisibleAnywhere, category = "Setting")
@@ -91,8 +95,7 @@ private:
 	UFUNCTION()
 		void TurnLeftAction();
 
-	//Menu
-		virtual void MenuOnOff() override;
+
 
 	UPROPERTY(EditAnywhere)
 		class UWidgetComponent* MenuComponent;

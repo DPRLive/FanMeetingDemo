@@ -51,5 +51,5 @@ private:
 		void LookUpMouse(float Scale);
 
 	//Menu
-	virtual void MenuOnOff() override;
+	void MenuOnOff();
 };

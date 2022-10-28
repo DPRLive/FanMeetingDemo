@@ -58,12 +58,12 @@ void ABasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABasePawn::Test_VRStart()
 {
-	Server_SwapCharacter(this, 1, TEXT("VTUBER"));
+	Server_SwapCharacter(this, 1, TEXT("MANAGER"));
 }
 
 void ABasePawn::Test_PCStart()
 {
-	Server_SwapCharacter(this, 0, "MANAGER");
+	Server_SwapCharacter(this, 0, "FAN");
 }
 
 void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int PlatformType, const FString& JoinType)

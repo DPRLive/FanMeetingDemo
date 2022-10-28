@@ -18,7 +18,7 @@ void UMainMenuUI::JoinLevel()
 {
 	UFanMeetingGameInstance* GameInstance = Cast<UFanMeetingGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (GameInstance == nullptr) return;
-	GameInstance->SetPlatformType(1); //0:pc 1:vr
+	GameInstance->SetPlatformType(0); //0:pc 1:vr
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("127.0.0.1"));
 	if (IsSetup()) Teardown();
 }
