@@ -35,13 +35,13 @@
   * EMail : imusun190812@gmail.com
   * github : https://github.com/DPRLive
   
-* 이종훈 : Dedicated Server 빌드, 관리자 웹페이지 Front & Backend 구성
+* 이종훈 : Dedicated Server 빌드 & 관리자 웹페이지 Front & Backend 구성
   * EMail : joung45387@gmail.com
   * github : https://github.com/joung45387
 
-* 차준혁 : 서버 보조, Level 디자인
+* 차준혁 : 서버 보조 & Level 디자인
   * EMail : ckwnsgur0702@naver.com
-  * githun : 
+  * github : https://github.com/chalaly
 
 * 장은슬 : VTuber 모델링
 
