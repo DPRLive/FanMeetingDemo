@@ -32,6 +32,12 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class ACharacter> VT_VRCharacterClass;
 
+	UPROPERTY()
+		USkeletalMesh* FanMeshObj;
+
+	UPROPERTY()
+		USkeletalMesh* VTuberMeshObj;
+
 	UFUNCTION(Server, Unreliable) // 0 = VR, 1 = PC
 		void Server_SwapCharacter(APawn* NowPawn, int PlatformType, const FString& JoinType);
 };

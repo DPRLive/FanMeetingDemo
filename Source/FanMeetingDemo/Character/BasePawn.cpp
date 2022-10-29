@@ -15,6 +15,11 @@
 ABasePawn::ABasePawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> FanMesh(TEXT("/Game/VTuberCharacter/fan"));
+	if (FanMesh.Object != nullptr) FanMeshObj = FanMesh.Object;
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> VTuberMesh(TEXT("/Game/VTuberCharacter/VTuberCharacter"));
+	if (VTuberMesh.Object != nullptr) VTuberMeshObj = VTuberMesh.Object;
 }
 
 void ABasePawn::BeginPlay()
@@ -69,24 +74,12 @@ void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int Platform
 		{
 			Character = Cast<ACharacter>(GetWorld()->SpawnActor(N_PCCharacterClass, &SpawnLocation));
 
-			USkeletalMesh* MySkeletalMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/VTuberCharacter/VTuberCharacter.VTuberCharacter'"), NULL, LOAD_None, NULL);
-			if (MySkeletalMesh != nullptr)
-			{
-				// SetChangeMesh를 통해 server -> client로 SkeletalMesh Replicated
-				Cast<AParentCharacter>(Character)->SetChangeMesh(MySkeletalMesh);
-			}
+			if(VTuberMeshObj != nullptr) Cast<AParentCharacter>(Character)->SetChangeMesh(VTuberMeshObj);
 		}
 		else if (JoinType.Compare("FAN") == 0)
 		{
 			Character = Cast<ACharacter>(GetWorld()->SpawnActor(N_PCCharacterClass, &SpawnLocation));
-
-			USkeletalMesh* MySkeletalMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Scanned3DPeoplePack/RP_Character/rp_manuel_rigged_001_ue4/rp_manuel_rigged_001_ue4.rp_manuel_rigged_001_ue4'"), NULL, LOAD_None, NULL);
-			if (MySkeletalMesh != nullptr)
-			{
-				// SetChangeMesh를 통해 server -> client로 SkeletalMesh Replicated
-				Cast<AParentCharacter>(Character)->SetChangeMesh(MySkeletalMesh);
-			}
-			//Character = Cast<ACharacter>(GetWorld()->SpawnActor(MH_PCCharacterClass, &SpawnLocation));
+			if (FanMeshObj != nullptr) Cast<AParentCharacter>(Character)->SetChangeMesh(FanMeshObj);
 		}
 	}
 	else if (PlatformType == 1)
@@ -100,15 +93,8 @@ void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int Platform
 		else if (JoinType.Compare("FAN") == 0)
 		{
 			Character = Cast<ACharacter>(GetWorld()->SpawnActor(N_VRCharacterClass, &SpawnLocation));
+			if (FanMeshObj != nullptr) Cast<AParentCharacter>(Character)->SetChangeMesh(FanMeshObj);
 
-			USkeletalMesh* MySkeletalMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Scanned3DPeoplePack/RP_Character/rp_manuel_rigged_001_ue4/rp_manuel_rigged_001_ue4.rp_manuel_rigged_001_ue4'"), NULL, LOAD_None, NULL);
-			if (MySkeletalMesh != nullptr)
-			{
-				// SetChangeMesh를 통해 server -> client로 SkeletalMesh Replicated
-				Cast<AParentCharacter>(Character)->SetChangeMesh(MySkeletalMesh);
-			}
-
-			//Character = Cast<ACharacter>(GetWorld()->SpawnActor(MH_VRCharacterClass, &SpawnLocation));
 		}
 	}
 
