@@ -3,9 +3,12 @@
 //custom header
 #include "../FanMeetingGameInstance.h"
 #include "../FanMeetingPlayerState.h"
+#include "../Character/ParentCharacter.h"
 
 //unreal header
+#include "UObject/UObjectGlobals.h"
 #include "Kismet/GameplayStatics.h"
+#include "../FanMeetingPlayerState.h"
 #include "GameFramework/Character.h"
 
 
@@ -21,14 +24,21 @@ void ABasePawn::BeginPlay()
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		FTimerHandle WaitHandle;
-		// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
 		GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
 			{
+				AFanMeetingPlayerState* FMPlayerState = Cast<AFanMeetingPlayerState>(this->GetPlayerState());
 				UFanMeetingGameInstance* FMGameInstance = Cast<UFanMeetingGameInstance>(GetGameInstance());
 
 				Cast<APlayerController>(GetController())->SetName(FMGameInstance->GetPlayerName());
-				if (FMGameInstance->GetPlatformType() == 0) Server_SwapCharacter(this, 0);
-				else if (FMGameInstance->GetPlatformType() == 1) Server_SwapCharacter(this, 1);
+				int PlatformType = FMGameInstance->GetPlatformType();
+				FString JoinType = FMGameInstance->GetJoinType();
+
+				//서버에도 정보를 넘겨준다
+				if (FMPlayerState != nullptr)
+				{
+					FMPlayerState->Server_SetJoinType(JoinType);
+				}
+				Server_SwapCharacter(this, PlatformType, JoinType);
 			}), 0.1, false);
 	}
 }
@@ -44,18 +54,45 @@ void ABasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int Type)
+void ABasePawn::Server_SwapCharacter_Implementation(APawn* NowPawn, int PlatformType, const FString& JoinType)
 {
 	APlayerController* MyController = Cast<APlayerController>(NowPawn->GetController());
 	FVector SpawnLocation = NowPawn->GetActorLocation();
 	ACharacter* Character = nullptr;
-	if (Type == 1)
-		Character = Cast<ACharacter>(GetWorld()->SpawnActor(VRCharacterClass, &SpawnLocation));
-	else if (Type == 0)
-		Character = Cast<ACharacter>(GetWorld()->SpawnActor(PCCharacterClass, &SpawnLocation));
+
+	// 0 : PC , 1 : VR
+	if (PlatformType == 0) // 참여자 메타휴먼, 매니저 마네킹, 호스트 모델링 캐릭터
+	{
+		if (JoinType.Compare("MANAGER") == 0)
+			Character = Cast<ACharacter>(GetWorld()->SpawnActor(N_PCCharacterClass, &SpawnLocation));
+		else if (JoinType.Compare("VTUBER") == 0)
+		{
+			Character = Cast<ACharacter>(GetWorld()->SpawnActor(N_PCCharacterClass, &SpawnLocation));
+
+			USkeletalMesh* MySkeletalMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/VTuberCharacter/VTuberCharacter.VTuberCharacter'"), NULL, LOAD_None, NULL);
+			if (MySkeletalMesh != nullptr)
+			{
+				// SetChangeMesh를 통해 server -> client로 SkeletalMesh Replicated
+				Cast<AParentCharacter>(Character)->SetChangeMesh(MySkeletalMesh);
+			}
+		}
+		else if (JoinType.Compare("FAN") == 0)
+			Character = Cast<ACharacter>(GetWorld()->SpawnActor(MH_PCCharacterClass, &SpawnLocation));
+	}
+	else if (PlatformType == 1)
+	{
+		if (JoinType.Compare("MANAGER") == 0)
+			Character = Cast<ACharacter>(GetWorld()->SpawnActor(N_VRCharacterClass, &SpawnLocation));
+		else if (JoinType.Compare("VTUBER") == 0)
+		{
+			Character = Cast<ACharacter>(GetWorld()->SpawnActor(VT_VRCharacterClass, &SpawnLocation));
+		}
+		else if (JoinType.Compare("FAN") == 0)
+			Character = Cast<ACharacter>(GetWorld()->SpawnActor(MH_VRCharacterClass, &SpawnLocation));
+	}
 	
 	MyController->UnPossess();
 	MyController->Possess(Character);
 	NowPawn->Destroy();
-}
 
+}

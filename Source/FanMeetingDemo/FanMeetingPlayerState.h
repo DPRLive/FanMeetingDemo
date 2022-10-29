@@ -13,4 +13,16 @@ UCLASS()
 class FANMEETINGDEMO_API AFanMeetingPlayerState : public APlayerState
 {
 	GENERATED_BODY()
+public:
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
+	UFUNCTION(Server, unreliable)
+		void Server_SetJoinType(const FString& S);
+
+	UFUNCTION(BlueprintCallable)
+		FString& GetJoinType() { return JoinType; }
+protected:
+	UPROPERTY(Replicated)
+		FString JoinType;
+
 };

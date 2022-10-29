@@ -1,8 +1,11 @@
+// Fill out your copyright notice in the Description page of Project Settings.
 #include "VRCharacter.h"
-#include "../UI/NamePlate.h"
-#include "../FanMeetingPlayerState.h"
-
+//custom header
+#include "../UI/InGameUI.h"
+//plugin header
 //unreal header
+#include "Components/SplineMeshComponent.h"
+#include "Components/WidgetInteractionComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Components/WidgetComponent.h"
 #include "MotionControllerComponent.h"
@@ -26,8 +29,18 @@ AVRCharacter::AVRCharacter()
 	ControllerLeft = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("ControllerLeft"));
 	ControllerLeft->SetupAttachment(VRRoot);
 
+	MenuComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("MenuComponent"));
+	MenuComponent->SetupAttachment(ControllerLeft);
+	MenuComponent->SetDrawSize(FVector2D(800, 800));
+
 	ControllerRight = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("ControllerRight"));
 	ControllerRight->SetupAttachment(VRRoot);
+
+	RightPointer = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("RightPointer"));
+	RightPointer->SetupAttachment(ControllerRight);
+
+	RightPointerMesh = CreateDefaultSubobject<USplineMeshComponent>(TEXT("RightPointerMesh"));
+	RightPointerMesh->SetupAttachment(RightPointer);
 
 	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
 	PostProcessComponent->bUnbound = false;
@@ -51,61 +64,22 @@ void AVRCharacter::BeginPlay()
 		BlinkerMaterialInstance = UMaterialInstanceDynamic::Create(BlinkerMaterialBase, this);
 		// 액터가 들고있는 PostProcess Component에 적용
 		PostProcessComponent->AddOrUpdateBlendable(BlinkerMaterialInstance);
-	}
+	}	
 	// Super::BeginPlay를 나중에 호출해야 cpp코드가 블루프린트보다 먼저 호출됨.
 	Super::BeginPlay();
 	OnResetVR();
-
-	FTimerHandle WaitHandle;
-	// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
-	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
-		{
-			NamePlateUpdate();
-		}), 0.1, false);
-}
-
-void AVRCharacter::NamePlateUpdate()
-{
-	if (IsLocallyControlled()) NamePlate->SetVisibility(false);
-	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
-	if (HasAuthority())
-	{
-		/*TArray<AActor*> ActorArray;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlayerControllerClass, ActorArray);
-		ActorArray.Sort([](const AActor& A, const AActor& B) {
-			return A.GetName() > B.GetName();
-			});
-		for (int32 i = 0; i < ActorArray.Num(); i++)
-		{
-			PlayerNameRef = Cast<APlayerController>(ActorArray[i])->PlayerState->GetPlayerName();
-			OnRep_PlayerNameRef();
-		}*/
-		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
-		OnRep_PlayerNameRef();
-	}
-	else
-	{
-		Cast<UNamePlate>(NamePlate->GetWidget())->SetVRCharacterRef(this);
-	}
-}
-
-void AVRCharacter::OnRep_PlayerNameRef()
-{
-	PlayerName = PlayerNameRef;
-}
-
-void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AVRCharacter, PlayerName);
-	DOREPLIFETIME(AVRCharacter, PlayerNameRef);
 }
 
 void AVRCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (UseBlinker) UpdateBlinkers();
+}
+
+void AVRCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AVRCharacter, IsSitting);
 }
 
 void AVRCharacter::UpdateBlinkers()
@@ -131,7 +105,9 @@ void AVRCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AVRCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AVRCharacter::StopJumping);
 	PlayerInputComponent->BindAction(TEXT("OnResetVR"), IE_Pressed, this, &AVRCharacter::OnResetVR);
-	PlayerInputComponent->BindAction(TEXT("SetBlink"), IE_Pressed, this, &AVRCharacter::SetBlink);
+	PlayerInputComponent->BindAction(TEXT("MenuOnOff"), IE_Pressed, this, &AVRCharacter::MenuOnOff);
+	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Pressed, this, &AVRCharacter::TriggerRightPressed);
+	PlayerInputComponent->BindAction(TEXT("TriggerRight"), IE_Released, this, &AVRCharacter::TriggerRightReleased);
 }
 
 void AVRCharacter::OnResetVR()
@@ -143,6 +119,15 @@ void AVRCharacter::SetBlink()
 {
 	if (UseBlinker) UseBlinker = false;
 	else UseBlinker = true;
+}
+
+void AVRCharacter::Server_ToggleIsSitting_Implementation()
+{
+	if (HasAuthority())
+	{
+		if (IsSitting) IsSitting = false;
+		else IsSitting = true;
+	}
 }
 
 void AVRCharacter::MoveForward(float Scale)
@@ -166,4 +151,50 @@ void AVRCharacter::TurnLeftAction()
 {
 	float NewYaw = GetControlRotation().Yaw + (-BaseTurnRate);
 	GetController()->SetControlRotation(FRotator(0, NewYaw, 0));
+}
+
+void AVRCharacter::MenuOnOff()
+{
+	if (InGameUI == nullptr)
+	{
+		if (MenuWidget == nullptr) return;
+		InGameUI = CreateWidget<UMenuWidget>(GetWorld(), MenuWidget);
+		InGameUI->SetOwner(this);
+		InGameUI->SetOwnerPlatformType(1);
+		if (InGameUI != nullptr && MenuComponent != nullptr && MenuComponent->GetWidget() == nullptr)
+		{
+			RightPointerMesh->SetVisibility(true);
+			ControllerLeft->SetShowDeviceModel(true);
+			ControllerRight->SetShowDeviceModel(true);
+			MenuComponent->SetWidget(InGameUI);
+		}
+	}
+	else
+	{
+		if (InGameUI != nullptr && MenuComponent->GetWidget() == nullptr)
+		{
+			RightPointerMesh->SetVisibility(true);
+			ControllerLeft->SetShowDeviceModel(true);
+			ControllerRight->SetShowDeviceModel(true);
+			MenuComponent->SetWidget(InGameUI);
+		}
+		else
+		{
+			if (MenuComponent == nullptr) return;
+			RightPointerMesh->SetVisibility(false);
+			ControllerLeft->SetShowDeviceModel(false);
+			ControllerRight->SetShowDeviceModel(false);
+			MenuComponent->SetWidget(nullptr);
+		}
+	}
+}
+
+void AVRCharacter::TriggerRightPressed()
+{
+	RightPointer->PressPointerKey(EKeys::LeftMouseButton);
+}
+
+void AVRCharacter::TriggerRightReleased()
+{
+	RightPointer->ReleasePointerKey(EKeys::LeftMouseButton);
 }
