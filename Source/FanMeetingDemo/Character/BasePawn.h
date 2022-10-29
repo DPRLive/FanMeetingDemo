@@ -24,13 +24,7 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<class ACharacter> MH_PCCharacterClass;
-
-	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class ACharacter> N_PCCharacterClass;
-
-	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<class ACharacter> MH_VRCharacterClass;
 
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class ACharacter> N_VRCharacterClass;
