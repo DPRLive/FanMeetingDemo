@@ -27,8 +27,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	bool UseHMD;
-
 	UPROPERTY(VisibleAnywhere)
 		USceneComponent* VRRoot;
 
@@ -47,11 +45,18 @@ private:
 	UPROPERTY(VisibleAnywhere)
 		UWidgetInteractionComponent* LeftPointer;
 
-	TSubclassOf<UMainMenuUI> MainMenu;
+	UPROPERTY()
+		TSubclassOf<UMainMenuUI> MainMenu;
 
-	void TriggerRightPressed();
-	void TriggerLeftPressed();
-	void TriggerRightReleased();
-	void TriggerLeftReleased();
+	UFUNCTION()
+		void TriggerRightPressed();
 
+	UFUNCTION()
+		void TriggerLeftPressed();
+
+	UFUNCTION()
+		void TriggerRightReleased();
+
+	UFUNCTION()
+		void TriggerLeftReleased();
 };

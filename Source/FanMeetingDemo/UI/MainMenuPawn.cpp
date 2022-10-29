@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "MainMenuPawn.h"
+#include "../Character/ParentCharacter.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 
 
@@ -24,6 +25,10 @@ AMainMenuPawn::AMainMenuPawn()
 
 	LeftPointer = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("LeftPointer"));
 	LeftPointer->SetupAttachment(LeftController);
+
+	ConstructorHelpers::FClassFinder<UMainMenuUI> MainMenuUIBPClass(TEXT("/Game/UI/WBP_MainMenuUI"));
+	if (MainMenuUIBPClass.Class == nullptr) return;
+	MainMenu = MainMenuUIBPClass.Class;
 }
 
 void AMainMenuPawn::BeginPlay()
@@ -78,4 +83,3 @@ void AMainMenuPawn::TriggerLeftReleased()
 {
 	LeftPointer->ReleasePointerKey(EKeys::LeftMouseButton);
 }
-

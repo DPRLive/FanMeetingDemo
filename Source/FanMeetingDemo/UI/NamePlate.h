@@ -2,8 +2,7 @@
 
 #pragma once
 // custom headers
-#include "../Character/PCCharacter.h"
-#include "../Character/VRCharacter.h"
+#include "../Character/ParentCharacter.h"
 
 // unreal headers
 #include "Components/TextBlock.h"
@@ -21,14 +20,10 @@ class FANMEETINGDEMO_API UNamePlate : public UUserWidget
 	
 public:
 	void SetName(const FString& NewName) { PlayerName->SetText(FText::FromString(NewName)); }
-	void SetPCCharacterRef(APCCharacter* Character);
-	void SetVRCharacterRef(AVRCharacter* Character);
+	void SetCharacterRef(AParentCharacter* Character) { CharacterRef = Character; }
 protected:
 	UPROPERTY(BlueprintReadOnly)
-		APCCharacter* PCCharacterRef;
-
-	UPROPERTY(BlueprintReadOnly)
-		AVRCharacter* VRCharacterRef;
+		AParentCharacter* CharacterRef;
 private:
 
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))

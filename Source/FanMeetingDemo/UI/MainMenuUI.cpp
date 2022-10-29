@@ -20,4 +20,5 @@ void UMainMenuUI::JoinLevel()
 	if (GameInstance == nullptr) return;
 	GameInstance->SetPlatformType(1); //0:pc 1:vr
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("127.0.0.1"));
+	if (IsSetup()) Teardown();
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../Character/ParentCharacter.h"
 #include "MenuWidget.generated.h"
 
 /**
@@ -15,9 +16,27 @@ class FANMEETINGDEMO_API UMenuWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	virtual bool Initialize() override;
+
 	void Setup();
+
 	void Teardown();
+
 	bool IsSetup() { return bSetup; }
+
+	void SetOwner(AParentCharacter* NewOwner) { Owner = NewOwner; }
+
+	void SetOwnerPlatformType(int32 NewPlayformType) { PlatformType = NewPlayformType; }
+
+	AParentCharacter* GetOwner() { return Owner; }
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+		int32 PlatformType = -1;
+
+	UPROPERTY(BlueprintReadOnly)
+		AParentCharacter* Owner;
+
 private:
 	bool bSetup = false;
 };

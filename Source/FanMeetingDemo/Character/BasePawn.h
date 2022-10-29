@@ -24,11 +24,20 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<class ACharacter> PCCharacterClass;
+		TSubclassOf<class ACharacter> MH_PCCharacterClass;
 
 	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<class ACharacter> VRCharacterClass;
+		TSubclassOf<class ACharacter> N_PCCharacterClass;
+
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class ACharacter> MH_VRCharacterClass;
+
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class ACharacter> N_VRCharacterClass;
+
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class ACharacter> VT_VRCharacterClass;
 
 	UFUNCTION(Server, Unreliable) // 0 = VR, 1 = PC
-		void Server_SwapCharacter(APawn* NowPawn, int Type);
+		void Server_SwapCharacter(APawn* NowPawn, int PlatformType, const FString& JoinType);
 };

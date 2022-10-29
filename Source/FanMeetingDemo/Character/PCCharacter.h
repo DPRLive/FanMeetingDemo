@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "ParentCharacter.h"
 #include "PCCharacter.generated.h"
 
 UCLASS()
-class FANMEETINGDEMO_API APCCharacter : public ACharacter
+class FANMEETINGDEMO_API APCCharacter : public AParentCharacter
 {
 	GENERATED_BODY()
 
@@ -17,17 +17,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void NamePlateUpdate();
-
+	// Head bone 위 아래 회전을 위함
 	UPROPERTY(Replicated, BlueprintReadWrite)
-		FString PlayerName;
+		FRotator ControllerRotate;
 
-	UPROPERTY(ReplicatedUsing = OnRep_PlayerNameRef, BlueprintReadWrite)
-		FString PlayerNameRef;
+	UFUNCTION(BlueprintCallable)
+		void LockPlayerCameraYaw();
 
-	UFUNCTION()
-		void OnRep_PlayerNameRef();
-
+	UFUNCTION(BlueprintCallable)
+		void UnLockPlayerCameraYaw();
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -36,32 +34,22 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-
-	// for GetAllActorsOfClass
-	UPROPERTY(EditDefaultsOnly)
-		TSubclassOf<AActor> PlayerControllerClass;
-
 	// setting
 	UPROPERTY(EditAnywhere, category = "Setting")
-		float EyeForwardPosition = 0;
-	
-	UPROPERTY(EditAnywhere, category = "Setting")
-		float CharacterHeight = 0;
+		float CharacterHeight = 0; //NamePlate나중에 소켓에 추가하면 좋을듯
 
 	// components
 	UPROPERTY(EditAnywhere)
-		class UCameraComponent* Camera;
-
-	UPROPERTY(EditAnywhere)
 		class USpringArmComponent* CameraSpringArm;
 
-	UPROPERTY(EditAnywhere)
-		class UWidgetComponent* NamePlate;
-
 	//Movement
-	UFUNCTION()
-		void MoveForward(float Scale);
+	virtual void MoveForward(float Scale) override;
+
+	virtual void MoveRight(float Scale) override;
 
 	UFUNCTION()
-		void MoveRight(float Scale);
+		void LookUpMouse(float Scale);
+
+	//Menu
+	void MenuOnOff();
 };

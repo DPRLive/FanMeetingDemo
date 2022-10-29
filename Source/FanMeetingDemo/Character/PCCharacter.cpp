@@ -1,21 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "PCCharacter.h"
 // custom header
-#include "../UI/NamePlate.h"
-#include "../FanMeetingPlayerState.h"
+#include "../UI/InGameUI.h"
+//plugin header
 // unreal header
+#include "Camera/PlayerCameraManager.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
-
-
 APCCharacter::APCCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArm"));
 	CameraSpringArm->bUsePawnControlRotation = true;
 	CameraSpringArm->TargetArmLength = 0;
@@ -32,55 +30,38 @@ APCCharacter::APCCharacter()
 void APCCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	CameraSpringArm->SetRelativeLocation(FVector(0, EyeForwardPosition, CharacterHeight));
 	NamePlate->AddLocalOffset(FVector(0, 0, CharacterHeight / 2));
-
-	FTimerHandle WaitHandle;
-	// player state가 beginplay 하는 시점에 바로 생성이 안되는거 같음. 그래서 0.1초 기다리고 접근
-	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
-		{
-			NamePlateUpdate();
-		}), 0.1, false);
-}
-
-void APCCharacter::NamePlateUpdate()
-{
-	if (IsLocallyControlled()) NamePlate->SetVisibility(false);
-	else if (GetLocalRole() != ROLE_Authority) NamePlate->SetVisibility(true);
-	if (HasAuthority())
+	CameraSpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("EyePosSocket"));
+	
+	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		/*TArray<AActor*> ActorArray;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlayerControllerClass, ActorArray);
-		ActorArray.Sort([](const AActor& A, const AActor& B){
-			return A.GetName() > B.GetName();
-		});
-		for (int32 i = 0; i < ActorArray.Num(); i++)
+		APlayerCameraManager* PlayerCameraManager = Cast<APlayerController>(GetController())->PlayerCameraManager;
+		if (PlayerCameraManager != nullptr)
 		{
-			PlayerNameRef = Cast<APlayerController>(ActorArray[i])->PlayerState->GetPlayerName();
-			UE_LOG(LogTemp, Warning, TEXT("PlayerNameRef : %s"), *PlayerNameRef);
-			OnRep_PlayerNameRef();
-		}*/
-		PlayerNameRef = this->GetPlayerState()->GetPlayerName();
-		OnRep_PlayerNameRef();
-	}
-	else
-	{
-		Cast<UNamePlate>(NamePlate->GetWidget())->SetPCCharacterRef(this);
+			PlayerCameraManager->ViewPitchMax = 90.0f;
+			PlayerCameraManager->ViewPitchMin = -40.0f;
+		}
 	}
 }
 
 void APCCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(APCCharacter, PlayerName);
-	DOREPLIFETIME(APCCharacter, PlayerNameRef);
+	DOREPLIFETIME(APCCharacter, ControllerRotate);
 }
 
 void APCCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	// 머리 회전.. 서버에서 판독후 클라이언트의 AnimBlueprint에서 돌림
+	if (HasAuthority())
+	{
+		AController* MyController = GetController();
+		if (MyController != nullptr)
+		{
+			ControllerRotate = MyController->GetControlRotation();
+		}
+	}
 }
 
 void APCCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -90,15 +71,12 @@ void APCCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &APCCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &APCCharacter::MoveRight);
 	PlayerInputComponent->BindAxis(TEXT("TurnRightMouse"), this, &APCCharacter::AddControllerYawInput);
-	PlayerInputComponent->BindAxis(TEXT("LookUpMouse"), this, &APCCharacter::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis(TEXT("LookUpMouse"), this, &APCCharacter::LookUpMouse);
 
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APCCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &APCCharacter::StopJumping);
-}
-
-void APCCharacter::OnRep_PlayerNameRef()
-{
-	PlayerName = PlayerNameRef;
+	PlayerInputComponent->BindAction(TEXT("VoiceChatOnOff"), IE_Pressed, this, &APCCharacter::VoiceChatOnOff);
+	PlayerInputComponent->BindAction(TEXT("MenuOnOff"), IE_Pressed, this, &APCCharacter::MenuOnOff);
 }
 
 void APCCharacter::MoveForward(float Scale)
@@ -109,4 +87,57 @@ void APCCharacter::MoveForward(float Scale)
 void APCCharacter::MoveRight(float Scale)
 {
 	AddMovementInput(GetActorRightVector(), Scale);
+}
+
+void APCCharacter::LookUpMouse(float Scale)
+{
+	AddControllerPitchInput(Scale);
+}
+
+void APCCharacter::MenuOnOff()
+{
+	if (InGameUI == nullptr)
+	{
+		if (MenuWidget == nullptr) return;
+		InGameUI = CreateWidget<UMenuWidget>(GetWorld(), MenuWidget);
+		InGameUI->SetOwner(this);
+		InGameUI->SetOwnerPlatformType(0);
+		if (InGameUI != nullptr && !InGameUI->IsSetup()) InGameUI->Setup();
+	}
+	else
+	{
+		if (InGameUI != nullptr && !InGameUI->IsSetup()) InGameUI->Setup();
+		else InGameUI->Teardown();
+	}
+}
+
+void APCCharacter::LockPlayerCameraYaw()
+{
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		APlayerCameraManager* PlayerCameraManager = Cast<APlayerController>(GetController())->PlayerCameraManager;
+		float NowYaw = GetActorRotation().Yaw;
+		if (PlayerCameraManager != nullptr)
+		{
+			PlayerCameraManager->ViewPitchMax = 20.0f;
+			PlayerCameraManager->ViewPitchMin = -25.0f;
+			PlayerCameraManager->ViewYawMax = NowYaw + 85.0f; //266.0f; //86
+			PlayerCameraManager->ViewYawMin = NowYaw - 85.0f; //-95.0f; //85
+		}
+	}
+}
+
+void APCCharacter::UnLockPlayerCameraYaw()
+{
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		APlayerCameraManager* PlayerCameraManager = Cast<APlayerController>(GetController())->PlayerCameraManager;
+		if (PlayerCameraManager != nullptr)
+		{
+			PlayerCameraManager->ViewPitchMax = 90.0f;
+			PlayerCameraManager->ViewPitchMin = -40.0f;
+			PlayerCameraManager->ViewYawMax = 359.9f;
+			PlayerCameraManager->ViewYawMin = 0.0f;
+		}
+	}
 }
