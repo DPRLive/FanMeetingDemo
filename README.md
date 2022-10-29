@@ -2,7 +2,9 @@
 
 ※Metahuman 파일은 용량이 커서 별도로 다운받아 Content/ 에 넣어야함.
 
-《사용된 플러그인 & 에셋》
+[관리자 페이지 Web & WebServer](https://github.com/joung45387/FanMeeting.SpringServer)
+
+## 사용된 플러그인 & 에셋
 
 [VR IK Body (Motion Tracking)](https://www.unrealengine.com/marketplace/ko/item/4907c10801d643af9fbec003c0d2f1e3)
 
@@ -25,3 +27,22 @@
 [Twinmotion Chairs & Tables Pack 1 (의자 모델링)](https://www.unrealengine.com/marketplace/ko/item/35234beeb933415685c3929993da364b)
 
 [Dynamic Volumetric Sky (MainMenu Map 하늘)](https://www.unrealengine.com/marketplace/ko/item/b04ae01bb14542e4b9fe764bb2d8ac07)
+
+
+## Members
+ 
+* 조성윤 : Client 제작 & 프로젝트 총괄
+  * EMail : imusun190812@gmail.com
+  * github : https://github.com/DPRLive
+  
+* 이종훈 : Dedicated Server 빌드, 관리자 웹페이지 Front & Backend 구성
+  * EMail : joung45387@gmail.com
+  * github : https://github.com/joung45387
+
+* 차준혁 : 서버 보조, Level 디자인
+  * EMail : ckwnsgur0702@naver.com
+  * githun : 
+
+* 장은슬 : VTuber 모델링
+
+
