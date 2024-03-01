@@ -1,10 +1,15 @@
 # FanMeetingDemo
+2022 국립대학육성사업 학부융합 프로젝트 + 2022 한국정보기술학회 추계종합학술대회 대학생논문경진대회 </br>
+#### 언리얼 엔진4를 활용한 메타버스 VR 팬미팅 플랫폼 UE Client Repository 입니다.
 
-※Metahuman 파일은 용량이 커서 별도로 다운받아 Content/ 에 넣어야함.
+UE 4.27.2
 
-[관리자 페이지 Web & WebServer](https://github.com/joung45387/FanMeeting.SpringServer)
+## 관리자 페이지 Web & WebServer
+https://github.com/joung45387/FanMeeting.SpringServer
 
 ## 사용된 플러그인 & 에셋
+
+※Metahuman 파일은 용량이 커서 별도로 다운받아 Content/ 에 넣어야함.
 
 [VR IK Body (Motion Tracking)](https://www.unrealengine.com/marketplace/ko/item/4907c10801d643af9fbec003c0d2f1e3)
 
