@@ -1,8 +1,10 @@
 # FanMeetingDemo
 2022 국립대학육성사업 학부융합 프로젝트 + 2022 한국정보기술학회 추계종합학술대회 대학생논문경진대회 </br>
 #### 언리얼 엔진4를 활용한 메타버스 VR 팬미팅 플랫폼 UE Client Repository 입니다.
-
 UE 4.27.2
+
+## 제출 논문 
+https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11183982
 
 ## 관리자 페이지 Web & WebServer
 https://github.com/joung45387/FanMeeting.SpringServer
